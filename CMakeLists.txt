@@ -8,3 +8,4 @@ include_directories(lw1)
 
 add_executable(SimUDuck lw1/SimUDuck/SimUDuck.cpp)
 add_executable(SimUDuckFunc lw1/SimUDuckFunc/SimUDuckFunc.cpp)
+add_executable(WeatherStation lw2/WeatherStation/main.cpp)
