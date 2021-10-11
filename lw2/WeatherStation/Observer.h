@@ -46,6 +46,7 @@ public:
 	void NotifyObservers() override
 	{
 		T data = GetChangedData();
+		//второе задание делаем тупо копированием
 		for (auto & observer : m_observers)
 		{
 			observer->Update(data);

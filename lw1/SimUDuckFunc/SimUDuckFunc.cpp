@@ -1,72 +1,101 @@
 #include <cassert>
 #include <iostream>
-#include <memory>
-#include <vector>
+#include <utility>
 
 using namespace std;
 
-struct IFlyBehavior {
+struct IFlyBehavior
+{
     virtual ~IFlyBehavior() = default;;
 
     virtual void Fly() = 0;
 };
 
-void fly() {
+struct FlyWithWings
+{
+    FlyWithWings() = default;
+
+    void operator()()
+    {
+        m_flights_count++;
+        cout << "I'm flying for the " << m_flights_count << " time!!" << endl;
+    }
+
+private:
+    int m_flights_count = 0;
+};
+
+void fly()
+{
     cout << "I'm flying for the time!!" << endl;
 }
 
-void flyNoWay() {}
+void flyNoWay()
+{}
 
-void quack() {
+void quack()
+{
     cout << "Quack squeak!!!" << endl;
 }
 
-void squeak() {
+void squeak()
+{
     cout << "Squeek!!!" << endl;
 }
 
-void quackNoWay() {}
+void quackNoWay()
+{}
 
-void danceWaltz() {
+void danceWaltz()
+{
     cout << "I'm dancing waltz" << endl;
 }
 
-void danceMenuet() {
+void danceMenuet()
+{
     cout << "I'm dancing menuet" << endl;
 }
 
-void danceNoWay() {}
+void danceNoWay()
+{}
 
-class Duck {
+class Duck
+{
 public:
-    Duck(void(*flyingMethod)(),
-         void(*quackingMethod)(),
-         void(*dancingMethod)()) {
+    Duck(function<void()> flyingMethod,
+         function<void()> quackingMethod,
+         function<void()> dancingMethod)
+    {
         assert(quackingMethod);
         assert(dancingMethod);
-        SetFlyBehavior(flyingMethod);
-        m_quackingMethod = quackingMethod;
-        m_dancingMethod = dancingMethod;
+        SetFlyBehavior(std::move(flyingMethod));
+        m_quackingMethod = std::move(quackingMethod);
+        m_dancingMethod = std::move(dancingMethod);
     }
 
-    void Quack() const {
+    void Quack() const
+    {
         return m_quackingMethod();
     }
 
-    void Swim() {
+    void Swim()
+    {
         cout << "I'm swimming" << endl;
     }
 
-    void Dance() {
+    void Dance()
+    {
         return m_dancingMethod();
     }
 
-    void Fly() {
+    void Fly()
+    {
         return m_flyingMethod();
     }
 
-    void SetFlyBehavior(void(*flyingMethod)()) {
-        m_flyingMethod = flyingMethod;
+    void SetFlyBehavior(function<void()> flyingMethod)
+    {
+        m_flyingMethod = std::move(flyingMethod);
     }
 
     virtual void Display() const = 0;
@@ -74,73 +103,87 @@ public:
     virtual ~Duck() = default;
 
 private:
-    void (*m_flyingMethod)(){};
-
-    void (*m_quackingMethod)();
-
-    void (*m_dancingMethod)();
+    function<void()> m_flyingMethod;
+    function<void()> m_quackingMethod;
+    function<void()> m_dancingMethod;
 };
 
-class MallardDuck : public Duck {
+class MallardDuck : public Duck
+{
 public:
-    MallardDuck()
-            : Duck(fly, quack, danceWaltz) {
+    MallardDuck() : Duck(FlyWithWings(), quack, danceWaltz)
+    {
     }
 
-    void Display() const override {
+    void Display() const override
+    {
         cout << "I'm mallard duck" << endl;
     }
 };
 
-class RedheadDuck : public Duck {
+class RedheadDuck : public Duck
+{
 public:
     RedheadDuck()
-            : Duck(fly, quack, danceMenuet) {
+            : Duck(FlyWithWings(), quack, danceMenuet)
+    {
     }
 
-    void Display() const override {
+    void Display() const override
+    {
         cout << "I'm redhead duck" << endl;
     }
 };
 
-class DecoyDuck : public Duck {
+class DecoyDuck : public Duck
+{
 public:
     DecoyDuck()
-            : Duck(flyNoWay, quackNoWay, danceNoWay) {
+            : Duck(flyNoWay, quackNoWay, danceNoWay)
+    {
     }
 
-    void Display() const override {
+    void Display() const override
+    {
         cout << "I'm decoy duck" << endl;
     }
 };
 
-class RubberDuck : public Duck {
+class RubberDuck : public Duck
+{
 public:
     RubberDuck()
-            : Duck(flyNoWay, squeak, danceNoWay) {
+            : Duck(flyNoWay, squeak, danceNoWay)
+    {
     }
 
-    void Display() const override {
+    void Display() const override
+    {
         cout << "I'm rubber duck" << endl;
     }
 };
 
-class ModelDuck : public Duck {
+class ModelDuck : public Duck
+{
 public:
     ModelDuck()
-            : Duck(flyNoWay, quack, danceNoWay) {
+            : Duck(flyNoWay, quack, danceNoWay)
+    {
     }
 
-    void Display() const override {
+    void Display() const override
+    {
         cout << "I'm model duck" << endl;
     }
 };
 
-void DrawDuck(Duck const &duck) {
+void DrawDuck(Duck const &duck)
+{
     duck.Display();
 }
 
-void PlayWithDuck(Duck &duck) {
+void PlayWithDuck(Duck &duck)
+{
     DrawDuck(duck);
     duck.Quack();
     duck.Fly();
@@ -149,7 +192,8 @@ void PlayWithDuck(Duck &duck) {
     cout << endl;
 }
 
-int main() {
+int main()
+{
     MallardDuck mallardDuck;
     PlayWithDuck(mallardDuck);
 
@@ -164,6 +208,6 @@ int main() {
 
     ModelDuck modelDuck;
     PlayWithDuck(modelDuck);
-    modelDuck.SetFlyBehavior(fly);
+    modelDuck.SetFlyBehavior(FlyWithWings());
     PlayWithDuck(modelDuck);
 }

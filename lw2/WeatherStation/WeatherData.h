@@ -18,6 +18,7 @@ struct SWeatherInfo {
     double humidity = 0;
     double pressure = 0;
 
+    //можно вынести в приватныц метод класса
     std::map<std::string, double> ToMap() const {
         std::map<std::string, double> m = {
                 {TemperatureKey, temperature},
@@ -57,6 +58,7 @@ public:
         ++m_countAcc;
     }
 
+    //можно вынести в приватный метод класса
     void ShowStats() const {
         std::cout << "Max " << m_statsName << " " << m_max << std::endl;
         std::cout << "Min " << m_statsName << " " << m_min << std::endl;
