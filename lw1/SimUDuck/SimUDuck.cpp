@@ -5,6 +5,7 @@
 
 using namespace std;
 
+
 struct IFlyBehavior {
     virtual ~IFlyBehavior() = default;;
 
