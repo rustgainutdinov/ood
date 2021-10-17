@@ -36,6 +36,9 @@ public:
     virtual void NotifyObservers() = 0;
 
     virtual void RemoveObserver(IObserver<T> &observer) = 0;
+
+protected:
+    virtual void UpdateObserver(IObserver<T> *observer, T data) = 0;
 };
 
 // Реализация интерфейса IObservable
@@ -65,7 +68,7 @@ public:
             it--;
             for (ObserverType *observer: it->second)
             {
-                observer->Update(data);
+                UpdateObserver(observer, data);
             }
         }
     }
@@ -81,6 +84,11 @@ public:
     }
 
 protected:
+    void UpdateObserver(ObserverType *observer, T data) override
+    {
+        observer->Update(data);
+    }
+
     // Классы-наследники должны перегрузить данный метод,
     // в котором возвращать информацию об изменениях в объекте
     virtual T GetChangedData() const = 0;

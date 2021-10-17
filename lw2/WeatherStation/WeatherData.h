@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <climits>
 #include <map>
+#include <cmath>
 #include "Observer.h"
 
 using namespace std;
@@ -74,10 +75,24 @@ private:
     }
 };
 
-class CStatsAccumulator
+class IAccumulator
 {
 public:
-    void AddValue(double value)
+    virtual void AddValue(double value) = 0;
+
+    virtual double GetMin() const = 0;
+
+    virtual double GetMax() const = 0;
+
+    virtual double GetAverage() const = 0;
+
+    virtual ~IAccumulator() = default;
+};
+
+class CStatsAccumulator : public IAccumulator
+{
+public:
+    void AddValue(double value) override
     {
         if (m_min > value)
         {
@@ -91,17 +106,17 @@ public:
         ++m_countAcc;
     }
 
-    double GetMin() const
+    double GetMin() const override
     {
         return m_min;
     }
 
-    double GetMax() const
+    double GetMax() const override
     {
-        return m_min;
+        return m_max;
     }
 
-    double GetAverage() const
+    double GetAverage() const override
     {
         return m_acc / m_countAcc;
     }
@@ -113,46 +128,105 @@ private:
     unsigned m_countAcc = 0;
 };
 
+class CAngularStatsAccumulator : public IAccumulator
+{
+public:
+    void AddValue(double value) override
+    {
+        if (m_min > value)
+        {
+            m_min = value;
+        }
+        if (m_max < value)
+        {
+            m_max = value;
+        }
+        m_acc.push_back(value);
+        ++m_countAcc;
+    }
+
+    double GetMin() const override
+    {
+        return m_min;
+    }
+
+    double GetMax() const override
+    {
+        return m_max;
+    }
+
+    double GetAverage() const override
+    {
+        double x = 0, y = 0;
+        for (double i: m_acc)
+        {
+            double rad = i * PI / 180.0;
+            x += sin(rad);
+            y += cos(rad);
+        }
+        return fmod((atan2(x / m_countAcc, y / m_countAcc) * (180.0 / PI) + 360.0), 360);
+    }
+
+private:
+    const double PI = 3.141592653589793238463;
+    double m_min = numeric_limits<double>::infinity();
+    double m_max = -numeric_limits<double>::infinity();
+    vector<double> m_acc;
+    unsigned m_countAcc = 0;
+};
+
 class CStatsDisplay : public IObserver<SFullWeatherInfo>
 {
 public:
+    typedef IAccumulator AccumulatorType;
+
     CStatsDisplay()
     {
         m_statsAccumulators = {
-                {GenerateKey(InsideKey, TemperatureKey),    CStatsAccumulator()},
-                {GenerateKey(InsideKey, HumidityKey),       CStatsAccumulator()},
-                {GenerateKey(InsideKey, PressureKey),       CStatsAccumulator()},
-                {GenerateKey(OutsideKey, TemperatureKey),   CStatsAccumulator()},
-                {GenerateKey(OutsideKey, HumidityKey),      CStatsAccumulator()},
-                {GenerateKey(OutsideKey, PressureKey),      CStatsAccumulator()},
-                {GenerateKey(OutsideKey, WindSpeedKey),     CStatsAccumulator()},
-                {GenerateKey(OutsideKey, WindDirectionKey), CStatsAccumulator()},
+                {GenerateKey(InsideKey, TemperatureKey),    NewCStatsAccumulator()},
+                {GenerateKey(InsideKey, HumidityKey),       NewCStatsAccumulator()},
+                {GenerateKey(InsideKey, PressureKey),       NewCStatsAccumulator()},
+                {GenerateKey(OutsideKey, TemperatureKey),   NewCStatsAccumulator()},
+                {GenerateKey(OutsideKey, HumidityKey),      NewCStatsAccumulator()},
+                {GenerateKey(OutsideKey, PressureKey),      NewCStatsAccumulator()},
+                {GenerateKey(OutsideKey, WindSpeedKey),     NewCStatsAccumulator()},
+                {GenerateKey(OutsideKey, WindDirectionKey), NewCAngularStatsAccumulator()},
         };
     }
 
 private:
-    /* Метод Update сделан приватным, чтобы ограничить возможность его вызова напрямую
-    Классу CObservable он будет доступен все равно, т.к. в интерфейсе IObserver он
-    остается публичным
-    */
+    static CStatsAccumulator *NewCStatsAccumulator()
+    {
+        CStatsAccumulator *acc;
+        acc = (CStatsAccumulator *) malloc(sizeof(CStatsAccumulator));
+        new(acc) CStatsAccumulator;
+        return acc;
+    }
+
+    static CAngularStatsAccumulator *NewCAngularStatsAccumulator()
+    {
+        CAngularStatsAccumulator *acc;
+        acc = (CAngularStatsAccumulator *) malloc(sizeof(CAngularStatsAccumulator));
+        new(acc) CAngularStatsAccumulator;
+        return acc;
+    }
+
     void Update(SFullWeatherInfo const &weatherInfo) override
     {
         map<string, double> m = FullWeatherInfoToMap(weatherInfo);
-        for (auto &statsAccumulator: m_statsAccumulators)
+        auto it = m_statsAccumulators.begin();
+        while (it != m_statsAccumulators.end())
         {
-            statsAccumulator.second.AddValue(m.at(statsAccumulator.first));
-            ShowStats(statsAccumulator.first, statsAccumulator.second);
+            it->second->AddValue(m.at(it->first));
+
+            cout << "Max " << it->first << " " << it->second->GetMax() << endl;
+            cout << "Min " << it->first << " " << it->second->GetMin() << endl;
+            cout << "Average " << it->first << " " << it->second->GetAverage() << endl;
             cout << "---" << endl;
+            it++;
         }
         cout << "----------------" << endl;
     }
-
-    static void ShowStats(const string &statsKey, CStatsAccumulator statsAccumulator)
-    {
-        cout << "Max " << statsKey << " " << statsAccumulator.GetMax() << endl;
-        cout << "Min " << statsKey << " " << statsAccumulator.GetMin() << endl;
-        cout << "Average " << statsKey << " " << statsAccumulator.GetAverage() << endl;
-    };
 
     static string GenerateKey(const string &sensorType, const string &parameterName)
     {
@@ -174,12 +248,14 @@ private:
         return m;
     }
 
-    map<string, CStatsAccumulator> m_statsAccumulators;
+    map<string, AccumulatorType *> m_statsAccumulators;
 };
 
 class CWeatherData : public CObservable<SFullWeatherInfo>
 {
 public:
+    typedef IObserver<SFullWeatherInfo> ObserverType;
+
     void MeasurementsChanged()
     {
         NotifyObservers();
@@ -195,9 +271,26 @@ public:
             storeInsideWeatherInfo(measurements);
         }
 
+        fillChangedMeasurementKeys(measurements);
         MeasurementsChanged();
+        clearChangedMeasurementKeys();
     }
 
+    void RegisterObserver(ObserverType &observer, int priority, const string &measurementKey)
+    {
+        if (m_observer_measurement_key.find(&observer) == m_observer_measurement_key.end())
+        {
+            m_observer_measurement_key[&observer] = set<string>{};
+        }
+        m_observer_measurement_key[&observer].insert(measurementKey);
+        CObservable::RegisterObserver(observer, priority);
+    }
+
+    void RemoveObserver(ObserverType &observer, const string &measurementKey)
+    {
+        m_observer_measurement_key[&observer].erase(measurementKey);
+        CObservable::RemoveObserver(observer);
+    }
 
 protected:
     SFullWeatherInfo GetChangedData() const override
@@ -215,6 +308,19 @@ protected:
         return info;
     }
 
+    void UpdateObserver(ObserverType *observer, SFullWeatherInfo data) override
+    {
+        auto it = m_changed_measurement_keys.begin();
+        while (it != m_changed_measurement_keys.end())
+        {
+            if (m_observer_measurement_key[observer].find(*it) != m_observer_measurement_key[observer].end())
+            {
+                CObservable::UpdateObserver(observer, data);
+                return;
+            }
+            it++;
+        }
+    }
 
 private:
     struct SBaseWeatherInfoProvider
@@ -263,6 +369,37 @@ private:
         info.pressure = !measurements.pressure.wasSet ? defaultInfo.pressure : measurements.pressure.value;
     }
 
+    void fillChangedMeasurementKeys(SMeasurements measurements)
+    {
+        if (measurements.temperature.wasSet)
+        {
+            m_changed_measurement_keys.insert(TemperatureKey);
+        }
+        if (measurements.humidity.wasSet)
+        {
+            m_changed_measurement_keys.insert(HumidityKey);
+        }
+        if (measurements.pressure.wasSet)
+        {
+            m_changed_measurement_keys.insert(PressureKey);
+        }
+        if (measurements.windSpeed.wasSet)
+        {
+            m_changed_measurement_keys.insert(WindSpeedKey);
+        }
+        if (measurements.windDirection.wasSet)
+        {
+            m_changed_measurement_keys.insert(WindDirectionKey);
+        }
+    }
+
+    void clearChangedMeasurementKeys()
+    {
+        m_changed_measurement_keys.clear();
+    }
+
     SBaseWeatherInfoProvider m_inside_info;
     SOutsideWeatherInfoProvider m_outside_info;
+    map<ObserverType *, set<string>> m_observer_measurement_key;
+    set<string> m_changed_measurement_keys;
 };

@@ -81,6 +81,23 @@ private:
     CMockStringObservable *m_observable;
 };
 
+class CObserverMeasurementKeeper : public IObserver<SFullWeatherInfo>
+{
+public:
+    SFullWeatherInfo GetLastWeatherInfo()
+    {
+        return lastWeatherInfo;
+    }
+
+private:
+    void Update(SFullWeatherInfo const &data) override
+    {
+        lastWeatherInfo = data;
+    }
+
+    SFullWeatherInfo lastWeatherInfo;
+};
+
 class TestCObservable : public ::testing::Test
 {
 };
@@ -123,13 +140,19 @@ TEST_F(TestCObservable, shouldNotifyObserversByPriority)
 TEST_F(TestCWeatherData, shouldStoreLastMeasurements)
 {
     CWeatherData weatherData = CWeatherData();
-    CNotificationTimeKeeper observer0 = CNotificationTimeKeeper();
-    CNotificationTimeKeeper observer1 = CNotificationTimeKeeper();
-
+    CObserverMeasurementKeeper observer0 = CObserverMeasurementKeeper();
     weatherData.RegisterObserver(observer0, 0);
-    weatherData.RegisterObserver(observer1, 1);
-    weatherData.NotifyObservers();
-    ASSERT_TRUE(observer0.WhenNotified() > observer1.WhenNotified());
+    const int temperature = 35;
+    SMeasurements measurements = {true, true, temperature};
+    weatherData.SetMeasurements(measurements);
+    ASSERT_TRUE(observer0.GetLastWeatherInfo().outsideWeatherInfo.temperature == temperature);
+    measurements.temperature.wasSet = false;
+    weatherData.SetMeasurements(measurements);
+    measurements.temperature.value = 0;
+    measurements.temperature.wasSet = true;
+    measurements.isOutside = false;
+    weatherData.SetMeasurements(measurements);
+    ASSERT_TRUE(observer0.GetLastWeatherInfo().outsideWeatherInfo.temperature == temperature);
 }
 
 int main(int argc, char *argv[])
