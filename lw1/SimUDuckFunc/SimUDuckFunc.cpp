@@ -18,7 +18,7 @@ struct FlyWithWings
     void operator()()
     {
         m_flights_count++;
-        cout << "I'm flying for the " << m_flights_count << " time!!" << endl;
+        cout << "I'm flying for the " << m_flights_count << " notifiedTime!!" << endl;
     }
 
 private:
@@ -27,7 +27,7 @@ private:
 
 void fly()
 {
-    cout << "I'm flying for the time!!" << endl;
+    cout << "I'm flying for the notifiedTime!!" << endl;
 }
 
 void flyNoWay()

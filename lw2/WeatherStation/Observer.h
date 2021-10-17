@@ -1,7 +1,10 @@
 ﻿#pragma once
 
 #include <set>
+#include <map>
 #include <functional>
+
+using namespace std;
 
 /*
 Шаблонный интерфейс IObserver. Его должен реализовывать класс, 
@@ -28,7 +31,7 @@ class IObservable
 public:
     virtual ~IObservable() = default;
 
-    virtual void RegisterObserver(IObserver<T> &observer) = 0;
+    virtual void RegisterObserver(IObserver<T> &observer, int priority) = 0;
 
     virtual void NotifyObservers() = 0;
 
@@ -42,25 +45,39 @@ class CObservable : public IObservable<T>
 public:
     typedef IObserver<T> ObserverType;
 
-    void RegisterObserver(ObserverType &observer) override
+    void RegisterObserver(ObserverType &observer, int priority) override
     {
-        m_observers.insert(&observer);
+        if (m_observers.find(priority) == m_observers.end())
+        {
+            m_observers[priority] = set<ObserverType *>{};
+        }
+        m_observers[priority].insert(&observer);
     }
 
     void NotifyObservers() override
     {
         T data = GetChangedData();
-        std::set<ObserverType *> observers;
-        copy(m_observers.begin(), m_observers.end(), inserter(observers, observers.begin()));
-        for (auto &observer : m_observers)
+        std::map<int, set<ObserverType *>> observersByPriority;
+        copy(m_observers.begin(), m_observers.end(), inserter(observersByPriority, observersByPriority.begin()));
+        auto it = observersByPriority.end();
+        while (it != observersByPriority.begin())
         {
-            observer->Update(data);
+            it--;
+            for (ObserverType *observer: it->second)
+            {
+                observer->Update(data);
+            }
         }
     }
 
     void RemoveObserver(ObserverType &observer) override
     {
-        m_observers.erase(&observer);
+        auto it = m_observers.begin();
+        while (it != m_observers.end())
+        {
+            it->second.erase(&observer);
+            it++;
+        }
     }
 
 protected:
@@ -68,6 +85,5 @@ protected:
     // в котором возвращать информацию об изменениях в объекте
     virtual T GetChangedData() const = 0;
 
-private:
-    std::set<ObserverType *> m_observers;
+    map<int, set<ObserverType *>> m_observers;
 };

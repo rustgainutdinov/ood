@@ -28,7 +28,7 @@ int main()
 {
     myset s1;
 
-    // Fill in some data to test with, one at a time
+    // Fill in some data to test with, one at a notifiedTime
     s1.insert("Bob");
     s1.insert("Robert");
     s1.insert("Bert");
@@ -42,7 +42,7 @@ int main()
     cout << "After the 2nd element is deleted, the set s1 is:" << endl;
     printset(s1);
 
-    // Fill in some data to test with, one at a time, using an initializer list
+    // Fill in some data to test with, one at a notifiedTime, using an initializer list
     myset s2{"meow", "hiss", "purr", "growl", "yowl"};
 
     cout << "Starting data of set s2 is:" << endl;
@@ -55,7 +55,7 @@ int main()
 
     myset s3;
 
-    // Fill in some data to test with, one at a time, using emplace
+    // Fill in some data to test with, one at a notifiedTime, using emplace
     s3.emplace("C");
     s3.emplace("C#");
     s3.emplace("D");
