@@ -11,6 +11,10 @@ add_executable(SimUDuckFunc lw1/SimUDuckFunc/SimUDuckFunc.cpp)
 add_executable(WeatherStation lw2/WeatherStation/main.cpp)
 add_executable(SetErase examples/set_erase.cpp)
 add_executable(WeatherStationTests lw2/WeatherStation/test.cpp)
+
+include_directories("${PROJECT_SOURCE_DIR}/lw3/")
+add_executable(Coffee lw3/coffee/main.cpp)
+add_executable(Streams lw3/streams/main.cpp)
 target_link_libraries(WeatherStationTests gtest_main)
 add_test(NAME WeatherStationTests COMMAND WeatherStationTests)
 
