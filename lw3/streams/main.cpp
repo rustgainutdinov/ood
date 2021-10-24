@@ -1,5 +1,6 @@
 ﻿#include "FIleStream.h"
-#include "EncriptionStream.h"
+#include "StreamEncription.h"
+#include "StreamCompression.h"
 
 #include "vector"
 #include "iostream"
@@ -28,7 +29,9 @@ int main()
         CInputFileStream in("/home/rustamgainutdinov/CLionProjects/ood/lw3/streams/files/a.png");
         auto outFile = make_unique<COutputFileStream>(
                 "/home/rustamgainutdinov/CLionProjects/ood/lw3/streams/files/b.png");
-        auto outEncryption = make_unique<CEncryptionStream>(move(outFile), 7);
+        auto outCompressor = make_unique<CStreamCompressor>(move(outFile));
+
+        auto outEncryption = make_unique<CEncryptionStream>(move(outCompressor), 7);
         vector<char> buffer(1000, 0);
         while (!in.IsEOF())
         {
@@ -39,7 +42,9 @@ int main()
     {
         auto inFile = make_unique<CInputFileStream>(
                 "/home/rustamgainutdinov/CLionProjects/ood/lw3/streams/files/b.png");
-        auto inDecryption = make_unique<CDecryptionStream>(move(inFile), 7);
+        auto inDecompressor = make_unique<CStreamDecompressor>(move(inFile));
+
+        auto inDecryption = make_unique<CDecryptionStream>(move(inDecompressor), 7);
         auto outFile = make_unique<COutputFileStream>(
                 "/home/rustamgainutdinov/CLionProjects/ood/lw3/streams/files/c.png");
         vector<char> buffer(1000, 0);

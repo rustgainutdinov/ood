@@ -56,7 +56,7 @@ public:
 
     void WriteByte(uint8_t data) override
     {
-        m_fs.write(reinterpret_cast<const char *>(data), sizeof(uint8_t));
+        m_fs.write((char *) &data, sizeof(uint8_t));
     }
 
     void WriteBlock(const void *srcData, std::streamsize size) override
