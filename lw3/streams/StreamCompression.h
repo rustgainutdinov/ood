@@ -51,6 +51,7 @@ public:
             }
             char symbol = buffer[0];
             int symbolsCount = static_cast<int>(static_cast<unsigned char>(buffer[1]));
+            //TODO: подумать над обьединением циклов
             if (allReadSymbols + symbolsCount <= size)
             {
                 for (int i = 0; i < symbolsCount; i++)
@@ -80,6 +81,7 @@ private:
             return 0;
         }
         char *chars = static_cast<char *>(dstBuffer);
+        //TODO: смежритть циклыы
         if (size > bufferSymbolsCount)
         {
             for (int i = 0; i < bufferSymbolsCount; i++)
@@ -129,7 +131,8 @@ public:
                 repeatedSymbolsCount = 1;
                 continue;
             }
-            if (prevSymbol == currSymbol || repeatedSymbolsCount >= 255)
+            //TODO: проверить на repeatedSymbolsCount >= 255
+            if (prevSymbol == currSymbol)
             {
                 repeatedSymbolsCount++;
                 continue;
@@ -148,5 +151,6 @@ private:
         m_stream->WriteByte((int) repeatedSymbolsCount);
     }
 
+    //TODO: хранить состояние для запоминания предыдущего симвова и вызывать деструктор посмотреть про Flush
     IOutputDataStreamPtr m_stream;
 };

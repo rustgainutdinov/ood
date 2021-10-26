@@ -6,17 +6,24 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(.)
 include_directories(lw1)
 
+# lw1
 add_executable(SimUDuck lw1/SimUDuck/SimUDuck.cpp)
 add_executable(SimUDuckFunc lw1/SimUDuckFunc/SimUDuckFunc.cpp)
+
+# lw2
 add_executable(WeatherStation lw2/WeatherStation/main.cpp)
 add_executable(SetErase examples/set_erase.cpp)
 add_executable(WeatherStationTests lw2/WeatherStation/test.cpp)
+target_link_libraries(WeatherStationTests gtest_main)
+add_test(NAME WeatherStationTests COMMAND WeatherStationTests)
 
+# lw3
 include_directories("${PROJECT_SOURCE_DIR}/lw3/")
 add_executable(Coffee lw3/coffee/main.cpp)
 add_executable(Streams lw3/streams/main.cpp)
-target_link_libraries(WeatherStationTests gtest_main)
-add_test(NAME WeatherStationTests COMMAND WeatherStationTests)
+add_executable(StreamsTests lw3/streams/test.cpp)
+target_link_libraries(StreamsTests gtest_main)
+add_test(NAME StreamsTests COMMAND StreamsTests)
 
 
 include(FetchContent)

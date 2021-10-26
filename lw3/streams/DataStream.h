@@ -1,6 +1,7 @@
 #include <string>
 #include <cstdint>
 #include <memory>
+#include <ios>
 
 using namespace std;
 
@@ -14,7 +15,7 @@ public:
     // Записывает в поток блок данных размером size байт,
     // располагающийся по адресу srcData,
     // В случае ошибки выбрасывает исключение std::ios_base::failure
-    virtual void WriteBlock(const void *srcData, std::streamsize size) = 0;
+    virtual void WriteBlock(const void *srcData, streamsize size) = 0;
 
     virtual ~IOutputDataStream() = default;
 };

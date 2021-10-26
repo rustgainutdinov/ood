@@ -26,9 +26,9 @@ int main()
 //        }
 //    }
     {
-        CInputFileStream in("/home/rustamgainutdinov/CLionProjects/ood/lw3/streams/files/a.png");
+        CInputFileStream in("/Users/rustamgajnutdinov/Documents/study/ood/lw3/streams/files/a.txt");
         auto outFile = make_unique<COutputFileStream>(
-                "/home/rustamgainutdinov/CLionProjects/ood/lw3/streams/files/b.png");
+                "/Users/rustamgajnutdinov/Documents/study/ood/lw3/streams/files/b.txt");
         auto outCompressor = make_unique<CStreamCompressor>(move(outFile));
 
         auto outEncryption = make_unique<CEncryptionStream>(move(outCompressor), 7);
@@ -41,12 +41,12 @@ int main()
     }
     {
         auto inFile = make_unique<CInputFileStream>(
-                "/home/rustamgainutdinov/CLionProjects/ood/lw3/streams/files/b.png");
+                "/Users/rustamgajnutdinov/Documents/study/ood/lw3/streams/files/b.txt");
         auto inDecompressor = make_unique<CStreamDecompressor>(move(inFile));
 
         auto inDecryption = make_unique<CDecryptionStream>(move(inDecompressor), 7);
         auto outFile = make_unique<COutputFileStream>(
-                "/home/rustamgainutdinov/CLionProjects/ood/lw3/streams/files/c.png");
+                "/Users/rustamgajnutdinov/Documents/study/ood/lw3/streams/files/c.txt");
         vector<char> buffer(1000, 0);
         while (!inDecryption->IsEOF())
         {

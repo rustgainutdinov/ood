@@ -2,12 +2,13 @@
 #include <map>
 #include <random>
 #include <algorithm>
+#include <array>
 
 using namespace std;
 
 map<char, char> GenerateEncryptionTable(int key)
 {
-    std::array<int, 255> randNums{};
+    array<int, 255> randNums{};
     for (int i = 0; i < 256; i++)
     {
         randNums[i] = i;

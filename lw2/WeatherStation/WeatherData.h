@@ -251,6 +251,7 @@ private:
     map<string, AccumulatorType *> m_statsAccumulators;
 };
 
+//TODO: декомпозировать на inside и outside
 class CWeatherData : public CObservable<SFullWeatherInfo>
 {
 public:
@@ -278,6 +279,7 @@ public:
 
     void RegisterObserver(ObserverType &observer, int priority, const string &measurementKey)
     {
+        //TODO: вынести в базовый класс
         if (m_observer_measurement_key.find(&observer) == m_observer_measurement_key.end())
         {
             m_observer_measurement_key[&observer] = set<string>{};
