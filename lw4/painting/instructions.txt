@@ -1,2 +1,0 @@
-rectangle red 0 0 0 0
-rectangle red 0 0 0 0

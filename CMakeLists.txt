@@ -30,3 +30,26 @@ FetchContent_Declare(
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
+
+#OPENCV
+FetchContent_Declare(
+        opencv
+        GIT_REPOSITORY https://github.com/opencv/opencv.git
+        GIT_TAG        4.4.0
+)
+FetchContent_GetProperties(opencv)
+if (NOT opencv_POPULATED)
+    FetchContent_Populate(opencv)
+endif ()
+FetchContent_MakeAvailable(opencv)
+
+# Find on pc
+set(OpenCV_DIR ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${OpenCV_INCLUDE_DIRS})
+find_package(OpenCV REQUIRED)
+
+target_link_libraries(Painting ${OpenCV_LIBS})
+
+# Find on pc
+
+#

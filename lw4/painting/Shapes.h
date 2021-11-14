@@ -16,9 +16,9 @@ public:
         return m_color;
     }
 
-    virtual function<void(ICanvas *canvas)> getDrawMethod() const = 0;
+    virtual function<void(ICanvas &canvas)> getDrawMethod() const = 0;
 
-private:
+protected:
     Color m_color;
 };
 
@@ -32,14 +32,15 @@ public:
         m_rightTop = Point{rightBottom.x, leftTop.y};
     }
 
-    function<void(ICanvas *canvas)> getDrawMethod() const override
+    function<void(ICanvas &canvas)> getDrawMethod() const override
     {
-        return [this](ICanvas *canvas) -> void
+        return [this](ICanvas &canvas) -> void
         {
-            canvas->DrawLine(m_leftTop, m_leftBottom);
-            canvas->DrawLine(m_leftBottom, m_rightBottom);
-            canvas->DrawLine(m_rightBottom, m_rightTop);
-            canvas->DrawLine(m_rightTop, m_leftTop);
+            canvas.SetColor(m_color);
+            canvas.DrawLine(m_leftTop, m_leftBottom);
+            canvas.DrawLine(m_leftBottom, m_rightBottom);
+            canvas.DrawLine(m_rightBottom, m_rightTop);
+            canvas.DrawLine(m_rightTop, m_leftTop);
         };
     }
 
@@ -48,4 +49,27 @@ private:
     Point m_leftBottom{};
     Point m_rightBottom;
     Point m_rightTop{};
+};
+
+class CEllipse : public CShape
+{
+public:
+    CEllipse(Color color, Point center, int horizontalRadius, int verticalRadius) :
+            CShape(color), m_center(center), m_horizontalRadius(horizontalRadius), m_verticalRadius(verticalRadius)
+    {
+    }
+
+    function<void(ICanvas &canvas)> getDrawMethod() const override
+    {
+        return [this](ICanvas &canvas) -> void
+        {
+            canvas.SetColor(m_color);
+            canvas.DrawEllipse(m_center, m_horizontalRadius, m_verticalRadius);
+        };
+    }
+
+private:
+    Point m_center;
+    int m_horizontalRadius;
+    int m_verticalRadius;
 };

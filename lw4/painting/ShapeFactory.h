@@ -68,6 +68,11 @@ public:
             return make_unique<CRectangle>(color, Point{stoi(description[2]), stoi(description[3])},
                                            Point{stoi(description[4]), stoi(description[5])});
         }
+        if (name == "ellipse")
+        {
+            return make_unique<CEllipse>(color, Point{stoi(description[2]), stoi(description[3])},
+                                         stoi(description[4]), stoi(description[5]));
+        }
         throw invalid_argument("Non-existent shape");
     }
 };
