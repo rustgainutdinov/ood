@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 include_directories(.)
 include_directories(lw1)
+include_directories(lw4)
 
 add_executable(SimUDuck lw1/SimUDuck/SimUDuck.cpp)
 add_executable(SimUDuckFunc lw1/SimUDuckFunc/SimUDuckFunc.cpp)
@@ -18,6 +19,7 @@ add_executable(Streams lw3/streams/main.cpp)
 target_link_libraries(WeatherStationTests gtest_main)
 add_test(NAME WeatherStationTests COMMAND WeatherStationTests)
 
+add_executable(Painting lw4/painting/main.cpp)
 
 include(FetchContent)
 FetchContent_Declare(
