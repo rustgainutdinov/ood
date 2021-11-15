@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include <functional>
 #include <utility>
 
 using namespace std;
