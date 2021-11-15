@@ -141,7 +141,7 @@ TEST_F(TestCWeatherData, shouldStoreLastMeasurements)
 {
     CWeatherData weatherData = CWeatherData();
     CObserverMeasurementKeeper observer0 = CObserverMeasurementKeeper();
-    weatherData.RegisterObserver(observer0, 0);
+    weatherData.RegisterObserver(observer0, 0, "key");
     const int temperature = 35;
     SMeasurements measurements = {true, true, temperature};
     weatherData.SetMeasurements(measurements);

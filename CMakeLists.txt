@@ -49,7 +49,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 find_package(OpenCV REQUIRED)
 
 target_link_libraries(Painting ${OpenCV_LIBS})
-
-# Find on pc
-
-#
+add_executable(PaintingTests lw4/painting/test.cpp)
+target_link_libraries(PaintingTests gtest_main)
+target_link_libraries(PaintingTests ${OpenCV_LIBS})
+add_test(NAME PaintingTests COMMAND PaintingTests)

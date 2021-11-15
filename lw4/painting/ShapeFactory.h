@@ -52,10 +52,12 @@ Color getColorFromString(const string &str)
 class IShapeFactory
 {
 public:
+    virtual ~IShapeFactory() = default;
+
     virtual unique_ptr<CShape> CreateShape(string description) const = 0;
 };
 
-class CShapeFactory : IShapeFactory
+class CShapeFactory : public IShapeFactory
 {
 public:
     unique_ptr<CShape> CreateShape(string descriptionStr) const override
