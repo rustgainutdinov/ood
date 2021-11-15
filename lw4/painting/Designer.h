@@ -5,6 +5,8 @@
 
 using namespace std;
 
+//TODO: для чего нужен IDesigner, как используется
+
 class IDesigner
 {
 public:

@@ -10,6 +10,7 @@ inline bool instanceof(const T *)
     return is_base_of<Base, T>::value;
 }
 
+//TODO: реализовать тесты через потоки строк
 class CMockCanvas : public ICanvas
 {
 public:
@@ -34,8 +35,6 @@ public:
             if (((point.x - m_linePoint[0].x) * (point.y - m_linePoint[1].y)) ==
                 ((point.x - m_linePoint[1].x) * (point.y - m_linePoint[0].y)))
             {
-                cout << ((point.x - m_linePoint[0].x) * (point.y - m_linePoint[1].y))
-                     << ", " << ((point.x - m_linePoint[1].x) * (point.y - m_linePoint[0].y)) << endl;
                 return true;
             }
         }
@@ -49,14 +48,17 @@ class TestShapeFactory : public ::testing::Test
 {
 };
 
-TEST_F(TestShapeFactory, shouldCreateRectangle)
+TEST_F(TestShapeFactory, shouldCreateRectangle
+)
 {
-    auto canvas = make_unique<CMockCanvas>();
-    unique_ptr<IShapeFactory> shapeFactory = make_unique<CShapeFactory>();
-    auto shape = shapeFactory->CreateShape("rectangle red 0 0 100 100");
-    auto draw = shape->getDrawMethod();
-    draw(*canvas);
-    ASSERT_TRUE(canvas->BelongsToDrawnLine({50, 0}));
+auto canvas = make_unique<CMockCanvas>();
+unique_ptr<IShapeFactory> shapeFactory = make_unique<CShapeFactory>();
+auto shape = shapeFactory->CreateShape("rectangle red 0 0 100 100");
+auto draw = shape->getDrawMethod();
+draw(*canvas);
+ASSERT_TRUE(canvas
+->BelongsToDrawnLine({
+50, 0}));
 }
 
 int main(int argc, char *argv[])

@@ -3,6 +3,7 @@
 
 using namespace std;
 
+//TODO: для чего нужен IPictureDraft
 class IPictureDraft
 {
 public:
@@ -21,6 +22,7 @@ public:
         return m_shapes.size();
     }
 
+    //TODO: удаляет фигуру, исправить
     unique_ptr<CShape> GetShape(int index) override
     {
         return move(m_shapes[index]);

@@ -60,26 +60,3 @@ add_executable(PaintingTests lw4/painting/test.cpp)
 target_link_libraries(PaintingTests gtest_main)
 target_link_libraries(PaintingTests ${OpenCV_LIBS})
 add_test(NAME PaintingTests COMMAND PaintingTests)
-
-#OPENCV
-FetchContent_Declare(
-        opencv
-        GIT_REPOSITORY https://github.com/opencv/opencv.git
-        GIT_TAG        4.4.0
-)
-FetchContent_GetProperties(opencv)
-if (NOT opencv_POPULATED)
-    FetchContent_Populate(opencv)
-endif ()
-FetchContent_MakeAvailable(opencv)
-
-# Find on pc
-set(OpenCV_DIR ${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${OpenCV_INCLUDE_DIRS})
-find_package(OpenCV REQUIRED)
-
-target_link_libraries(Painting ${OpenCV_LIBS})
-add_executable(PaintingTests lw4/painting/test.cpp)
-target_link_libraries(PaintingTests gtest_main)
-target_link_libraries(PaintingTests ${OpenCV_LIBS})
-add_test(NAME PaintingTests COMMAND PaintingTests)
