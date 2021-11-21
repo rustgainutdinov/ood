@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 project(ood)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 include_directories(.)
 include_directories(lw1)
@@ -20,13 +20,12 @@ add_test(NAME WeatherStationTests COMMAND WeatherStationTests)
 
 # lw3
 include_directories("${PROJECT_SOURCE_DIR}/lw3/")
-add_executable(Coffee lw3/coffee/main.cpp)
+add_executable(Coffee lw3/coffee/main.cpp lw5/editor/content/IImage.h lw5/editor/content/IParagraph.h)
 add_executable(Streams lw3/streams/main.cpp)
 add_executable(StreamsTests lw3/streams/test.cpp)
 target_link_libraries(StreamsTests gtest_main)
 add_test(NAME StreamsTests COMMAND StreamsTests)
 
-add_executable(Painting lw4/painting/main.cpp)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -42,7 +41,7 @@ FetchContent_MakeAvailable(googletest)
 FetchContent_Declare(
         opencv
         GIT_REPOSITORY https://github.com/opencv/opencv.git
-        GIT_TAG        4.4.0
+        GIT_TAG 4.4.0
 )
 FetchContent_GetProperties(opencv)
 if (NOT opencv_POPULATED)
@@ -55,8 +54,13 @@ set(OpenCV_DIR ${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${OpenCV_INCLUDE_DIRS})
 find_package(OpenCV REQUIRED)
 
+add_executable(Painting lw4/painting/main.cpp lw4/painting/Designer.cpp lw4/painting/shape/Shape.cpp lw4/painting/ShapeFactory.cpp lw4/painting/shape/Rectangle.cpp lw4/painting/shape/Ellipse.cpp lw4/painting/Painter.cpp lw4/painting/PictureDraft.cpp lw4/painting/Client.cpp lw4/painting/ImageCanvas.cpp lw4/painting/ImageCanvas.h)
 target_link_libraries(Painting ${OpenCV_LIBS})
-add_executable(PaintingTests lw4/painting/test.cpp)
+add_executable(PaintingTests lw4/painting/test.cpp lw4/painting/Designer.cpp lw4/painting/shape/Shape.cpp lw4/painting/ShapeFactory.cpp lw4/painting/shape/Rectangle.cpp lw4/painting/shape/Ellipse.cpp lw4/painting/Painter.cpp lw4/painting/PictureDraft.cpp lw4/painting/Client.cpp lw4/painting/ImageCanvas.cpp lw4/painting/ImageCanvas.h)
 target_link_libraries(PaintingTests gtest_main)
 target_link_libraries(PaintingTests ${OpenCV_LIBS})
 add_test(NAME PaintingTests COMMAND PaintingTests)
+
+add_executable(Editor lw5/editor/main.cpp lw5/editor/IDocument.h lw5/editor/CDocument.cpp lw5/editor/CDocument.h lw5/editor/content/IImage.h lw5/editor/content/IParagraph.h lw5/editor/content/CParagraph.cpp lw5/editor/content/CParagraph.h lw5/editor/content/CImage.cpp lw5/editor/content/CImage.h lw5/editor/documentItem/CDocumentItem.cpp lw5/editor/documentItem/CDocumentItem.h lw5/editor/documentItem/CConstDocumentItem.cpp lw5/editor/documentItem/CConstDocumentItem.h lw5/editorTests/test.cpp)
+add_executable(EditorTests lw5/editorTests/test.cpp  lw5/editor/IDocument.h lw5/editor/CDocument.cpp lw5/editor/CDocument.h lw5/editor/content/IImage.h lw5/editor/content/IParagraph.h lw5/editor/content/CParagraph.cpp lw5/editor/content/CParagraph.h lw5/editor/content/CImage.cpp lw5/editor/content/CImage.h lw5/editor/documentItem/CDocumentItem.cpp lw5/editor/documentItem/CDocumentItem.h lw5/editor/documentItem/CConstDocumentItem.cpp lw5/editor/documentItem/CConstDocumentItem.h lw5/editorTests/test.cpp)
+target_link_libraries(EditorTests gtest_main)

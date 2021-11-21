@@ -1,64 +1,106 @@
 #include <gtest/gtest.h>
-#include "Designer.h"
+#include <painting/lib/Point.h>
+#include "ShapeFactory.h"
+#include "ICanvas.h"
+#include "shape/Shape.h"
 #include "string"
+#include <vector>
+#include <algorithm>
+#include "stdexcept"
 
 using namespace std;
 
-template<typename Base, typename T>
-inline bool instanceof(const T *)
+const char *const ellipseElementFormat = "ellipse %s %d %d %d %d";
+const char *const lineElementFormat = "line %s %d %d %d %d";
+
+string GetColorFromString(const Color color)
 {
-    return is_base_of<Base, T>::value;
+    if (color == Color::Green)
+    {
+        return "green";
+    }
+    if (color == Color::Red)
+    {
+        return "red";
+    }
+    if (color == Color::Blue)
+    {
+        return "blue";
+    }
+    if (color == Color::Yellow)
+    {
+        return "yellow";
+    }
+    if (color == Color::Pink)
+    {
+        return "pink";
+    }
+    if (color == Color::Black)
+    {
+        return "black";
+    }
+    throw invalid_argument("Non-existent color");
 }
 
-//TODO: реализовать тесты через потоки строк
 class CMockCanvas : public ICanvas
 {
 public:
     void SetColor(Color color) override
     {
+        m_currentColor = color;
     }
 
     void DrawLine(Point from, Point to) override
     {
-        m_linePoints.push_back(vector<Point>{from, to});
+        char s[100];
+        auto color = GetColorFromString(m_currentColor);
+        sprintf(s, lineElementFormat, color.c_str(), from.x, from.y, to.x, to.y);
+        m_drawnElements.emplace_back(s);
     }
 
     void DrawEllipse(Point center, int horizontalRadius, int verticalRadius) override
     {
-
+        char s[100];
+        auto color = GetColorFromString(m_currentColor);
+        sprintf(s, ellipseElementFormat, color.c_str(), center.x, center.y, horizontalRadius, verticalRadius);
+        m_drawnElements.emplace_back(s);
     }
 
-    bool BelongsToDrawnLine(Point point)
+    vector<string> GetDrawnElements()
     {
-        for (auto &m_linePoint: m_linePoints)
-        {
-            if (((point.x - m_linePoint[0].x) * (point.y - m_linePoint[1].y)) ==
-                ((point.x - m_linePoint[1].x) * (point.y - m_linePoint[0].y)))
-            {
-                return true;
-            }
-        }
-        return false;
+        return m_drawnElements;
     }
 
-    vector<vector<Point>> m_linePoints{};
+private:
+    vector<string> m_drawnElements{};
+    Color m_currentColor{};
 };
 
 class TestShapeFactory : public ::testing::Test
 {
 };
 
-TEST_F(TestShapeFactory, shouldCreateRectangle
-)
+TEST_F(TestShapeFactory, shouldCreateRectangle)
 {
-auto canvas = make_unique<CMockCanvas>();
-unique_ptr<IShapeFactory> shapeFactory = make_unique<CShapeFactory>();
-auto shape = shapeFactory->CreateShape("rectangle red 0 0 100 100");
-auto draw = shape->getDrawMethod();
-draw(*canvas);
-ASSERT_TRUE(canvas
-->BelongsToDrawnLine({
-50, 0}));
+    auto canvas = make_unique<CMockCanvas>();
+    auto shapeFactory = make_unique<CShapeFactory>();
+    auto shape = shapeFactory->CreateShape("rectangle red 20 0 100 150");
+    shape->Draw(*canvas);
+    auto drawnElements = canvas->GetDrawnElements();
+    ASSERT_TRUE(find(drawnElements.begin(), drawnElements.end(), "line red 20 0 20 150") != drawnElements.end());
+    ASSERT_TRUE(find(drawnElements.begin(), drawnElements.end(), "line red 20 150 100 150") != drawnElements.end());
+    ASSERT_TRUE(find(drawnElements.begin(), drawnElements.end(), "line red 100 150 100 0") != drawnElements.end());
+    ASSERT_TRUE(find(drawnElements.begin(), drawnElements.end(), "line red 100 0 20 0") != drawnElements.end());
+}
+
+TEST_F(TestShapeFactory, shouldCreateEllipse)
+{
+    auto canvas = make_unique<CMockCanvas>();
+    auto shapeFactory = make_unique<CShapeFactory>();
+    auto shape = shapeFactory->CreateShape("ellipse black 20 30 100 150");
+    shape->Draw(*canvas);
+    auto drawnElements = canvas->GetDrawnElements();
+    ASSERT_TRUE(find(drawnElements.begin(), drawnElements.end(), "ellipse black 20 30 100 150") != drawnElements.end());
 }
 
 int main(int argc, char *argv[])

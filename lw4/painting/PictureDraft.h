@@ -1,38 +1,18 @@
-#include <utility>
-#include <vector>
+#include "IPictureDraftInfo.h"
 
-using namespace std;
+class CShape;
 
-//TODO: для чего нужен IPictureDraft
-class IPictureDraft
+class CPictureDraft : public IPictureDraftInfo
 {
 public:
-    virtual size_t GetShapeCount() = 0;
+    void AddShape(std::shared_ptr<CShape> shape);
 
-    virtual unique_ptr<CShape> GetShape(int index) = 0;
+    std::shared_ptr<CShape> GetShape(int index) override;
 
-    virtual void AddShape(unique_ptr<CShape> shape) = 0;
-};
+    size_t GetShapeCount() override;
 
-class CPictureDraft : IPictureDraft
-{
-public:
-    size_t GetShapeCount() override
-    {
-        return m_shapes.size();
-    }
-
-    //TODO: удаляет фигуру, исправить
-    unique_ptr<CShape> GetShape(int index) override
-    {
-        return move(m_shapes[index]);
-    }
-
-    void AddShape(unique_ptr<CShape> shape) override
-    {
-        return m_shapes.push_back(move(shape));
-    }
+    ~CPictureDraft() override;
 
 private:
-    vector<unique_ptr<CShape>> m_shapes{};
+    std::vector<std::shared_ptr<CShape>> m_shapes{};
 };

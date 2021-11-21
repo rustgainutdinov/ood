@@ -1,3 +1,6 @@
+#ifndef OOD_COLOR_H
+#define OOD_COLOR_H
+
 enum Color
 {
     Green,
@@ -7,3 +10,5 @@ enum Color
     Pink,
     Black,
 };
+
+#endif //OOD_COLOR_H

@@ -1,35 +1,20 @@
-#include "ShapeFactory.h"
-#include "PictureDraft.h"
-#include <sstream>
+#include "Painter.h"
 #include <iostream>
+#include <memory>
 
-using namespace std;
+class IShapeFactory;
 
-//TODO: для чего нужен IDesigner, как используется
+class ICanvas;
 
-class IDesigner
+class CDesigner : CPainter
 {
 public:
-    virtual unique_ptr<CPictureDraft> CreateDraft(istream &stream) = 0;
-};
+    ~CDesigner();
 
-class CDesigner : IDesigner
-{
-public:
-    explicit CDesigner(unique_ptr<CShapeFactory> factory) : m_factory(move(factory))
-    {}
+    explicit CDesigner(IShapeFactory &factory);
 
-    unique_ptr<CPictureDraft> CreateDraft(istream &stream) override
-    {
-        auto pictureDraft = make_unique<CPictureDraft>();
-        string s;
-        while (getline(stream, s))
-        {
-            pictureDraft->AddShape(m_factory->CreateShape(s));
-        }
-        return pictureDraft;
-    }
+    std::unique_ptr<IPictureDraftInfo> CreatePicture(std::istream &stream, ICanvas &canvas);
 
 private:
-    unique_ptr<CShapeFactory> m_factory;
+    IShapeFactory &m_factory;
 };
