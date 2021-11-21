@@ -6,6 +6,20 @@
 
 using namespace std;
 
+class TestDocumentItem : public ::testing::Test
+{
+};
+
+TEST_F(TestDocumentItem, shouldBeCoustructedWithOnlyOneParameter)
+{
+    auto paragraph = make_shared<CParagraph>("text");
+    auto image = make_shared<CImage>("path", 100, 100);
+    make_unique<CDocumentItem>(paragraph);
+    make_unique<CDocumentItem>(nullopt, image);
+    ASSERT_THROW(make_unique<CDocumentItem>(), invalid_argument);
+    ASSERT_THROW(make_unique<CDocumentItem>(paragraph, image), invalid_argument);
+}
+
 class TestDocument : public ::testing::Test
 {
 };
