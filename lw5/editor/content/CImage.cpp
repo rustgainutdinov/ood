@@ -4,6 +4,8 @@
 
 #include "CImage.h"
 
+#include <utility>
+
 Path CImage::GetPath() const
 {
     return m_path;
@@ -25,6 +27,6 @@ void CImage::Resize(int width, int height)
     m_height = height;
 }
 
-CImage::CImage(const Path &path, int width, int height) : m_path(path), m_width(width), m_height(height)
+CImage::CImage(Path path, int width, int height) : m_path(std::move(path)), m_width(width), m_height(height)
 {
 }

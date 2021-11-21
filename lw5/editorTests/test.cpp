@@ -2,6 +2,11 @@
 #include <lw5/editor/CDocument.h>
 #include <lw5/editor/content/CParagraph.h>
 #include <lw5/editor/content/CImage.h>
+#include <lw5/editor/command/CUndoableCommandExecutor.h>
+#include <lw5/editor/command/ICommand.h>
+#include <lw5/editor/command/CCommandFactory.h>
+
+#include <utility>
 #include "memory"
 
 using namespace std;
@@ -65,11 +70,108 @@ TEST_F(TestDocument, shouldDeleteDocumentItem)
     document->InsertParagraph("text 4");
     ASSERT_EQ(document->GetItemsCount(), 4);
     document->DeleteItem(1);
-    document->DeleteItem(2);
+    document->DeleteItem();
     ASSERT_THROW(document->GetItem(2), invalid_argument);
     ASSERT_EQ(document->GetItemsCount(), 2);
     ASSERT_EQ(document->GetItem(0).GetParagraph()->GetText(), "text 1");
     ASSERT_EQ(document->GetItem(1).GetParagraph()->GetText(), "text 3");
+}
+
+class TestUndoableCommandExecutor : public ::testing::Test
+{
+};
+
+class MockCommand : public ICommand
+{
+public:
+    explicit MockCommand(string name, string &mutableStr) : m_name(move(name)), m_mutableStr(mutableStr)
+    {}
+
+    void Execute() override
+    {
+        m_mutableStr = m_name + "executed";
+    }
+
+    void CancelExecution() override
+    {
+        m_mutableStr = m_name + "unexecuted";
+    }
+
+private:
+    string m_name;
+    string &m_mutableStr;
+};
+
+TEST_F(TestUndoableCommandExecutor, shouldUndoCommands)
+{
+    auto executor = make_unique<CUndoableCommandExecutor>();
+    string mutableStr;
+    auto command1 = make_shared<MockCommand>("command1", mutableStr);
+    auto command2 = make_shared<MockCommand>("command2", mutableStr);
+    executor->Add(move(command1));
+    ASSERT_EQ(mutableStr, "command1executed");
+    executor->Add(move(command2));
+    ASSERT_EQ(mutableStr, "command2executed");
+    executor->Undo();
+    ASSERT_EQ(mutableStr, "command2unexecuted");
+    executor->Undo();
+    ASSERT_EQ(mutableStr, "command1unexecuted");
+}
+
+TEST_F(TestUndoableCommandExecutor, shouldRedoCommands)
+{
+    auto executor = make_unique<CUndoableCommandExecutor>();
+    string mutableStr;
+    auto command1 = make_shared<MockCommand>("command1", mutableStr);
+    auto command2 = make_shared<MockCommand>("command2", mutableStr);
+    executor->Add(move(command1));
+    ASSERT_EQ(mutableStr, "command1executed");
+    executor->Add(move(command2));
+    ASSERT_EQ(mutableStr, "command2executed");
+    executor->Undo();
+    ASSERT_EQ(mutableStr, "command2unexecuted");
+    executor->Undo();
+    ASSERT_EQ(mutableStr, "command1unexecuted");
+    executor->Redo();
+    ASSERT_EQ(mutableStr, "command1executed");
+    executor->Redo();
+    ASSERT_EQ(mutableStr, "command2executed");
+}
+
+TEST_F(TestUndoableCommandExecutor, shouldClearCommandListIfGoneOnAnotherBranch)
+{
+    auto executor = make_unique<CUndoableCommandExecutor>();
+    string mutableStr;
+    auto command1 = make_shared<MockCommand>("command1", mutableStr);
+    auto command2 = make_shared<MockCommand>("command2", mutableStr);
+    auto command3 = make_shared<MockCommand>("command3", mutableStr);
+    executor->Add(move(command1));
+    executor->Add(move(command2));
+    executor->Undo();
+    executor->Add(command3);
+    executor->Undo();
+    ASSERT_EQ(mutableStr, "command3unexecuted");
+    executor->Undo();
+    ASSERT_EQ(mutableStr, "command1unexecuted");
+}
+
+class TestCommandFactory : public ::testing::Test
+{
+};
+
+TEST_F(TestCommandFactory, shouldCreateInsertParagraphCommand)
+{
+    auto document = make_shared<CDocument>();
+    auto commandFactory = make_unique<CCommandFactory>(document);
+    auto executor = make_unique<CUndoableCommandExecutor>();
+    auto command = commandFactory->CreateCommand("InsertParagraph end some1");
+    executor->Add(move(command));
+    ASSERT_EQ(document->GetItemsCount(), 1);
+    ASSERT_EQ(document->GetItem(0).GetParagraph()->GetText(), "some1");
+    command = commandFactory->CreateCommand("InsertParagraph 0 some2");
+    executor->Add(move(command));
+    ASSERT_EQ(document->GetItemsCount(), 2);
+    ASSERT_EQ(document->GetItem(0).GetParagraph()->GetText(), "some2");
 }
 
 int main(int argc, char *argv[])

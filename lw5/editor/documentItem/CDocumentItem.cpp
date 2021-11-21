@@ -5,6 +5,8 @@
 #include <lw5/editor/content/CParagraph.h>
 #include <lw5/editor/content/IImage.h>
 #include <lw5/editor/content/IParagraph.h>
+
+#include <utility>
 #include "CDocumentItem.h"
 
 using namespace std;

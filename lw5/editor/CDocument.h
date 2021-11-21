@@ -20,7 +20,7 @@ public:
 
     CDocumentItem GetItem(size_t index) override;
 
-    void DeleteItem(size_t index) override;
+    void DeleteItem(std::optional<size_t> index = std::nullopt) override;
 
     std::string GetTitle() const override;
 
@@ -35,6 +35,7 @@ private:
 
     std::vector<CDocumentItem> m_structure{};
     std::string m_title{};
+
 };
 
 

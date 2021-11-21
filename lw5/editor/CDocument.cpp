@@ -38,10 +38,14 @@ CDocumentItem CDocument::GetItem(size_t index)
     return m_structure[index];
 }
 
-void CDocument::DeleteItem(size_t index)
+void CDocument::DeleteItem(optional<size_t> index)
 {
-    AssertPositionInStructureExists(index);
-    m_structure.erase(m_structure.begin() + index);
+    if (index == nullopt)
+    {
+        index = GetItemsCount() - 1;
+    }
+    AssertPositionInStructureExists(index.value());
+    m_structure.erase(m_structure.begin() + index.value());
 }
 
 string CDocument::GetTitle() const

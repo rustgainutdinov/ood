@@ -30,7 +30,7 @@ public:
 
     virtual CDocumentItem GetItem(size_t index) = 0;
 
-    virtual void DeleteItem(size_t index) = 0;
+    virtual void DeleteItem(std::optional<size_t> index = std::nullopt) = 0;
 
     virtual std::string GetTitle() const = 0;
 

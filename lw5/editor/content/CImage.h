@@ -20,7 +20,7 @@ public:
 
     void Resize(int width, int height) override;
 
-    CImage(const Path &path, int width, int height);
+    CImage(Path path, int width, int height);
 
 private:
     int m_width;
