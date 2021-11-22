@@ -5,7 +5,7 @@
 
 CPainter::~CPainter() = default;
 
-void CPainter::DrawPicture(IPictureDraftInfo &draft, ICanvas &canvas)
+void CPainter::DrawPicture(const IPictureDraftInfo &draft, ICanvas &canvas)
 {
     for (int i = 0; i < draft.GetShapeCount(); i++)
     {

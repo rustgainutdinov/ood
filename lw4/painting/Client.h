@@ -9,7 +9,7 @@ public:
 
     CClient(CDesigner &designer, CPainter &painter);
 
-    void GetMultiplePicture();
+    void GetPicture();
 
 private:
     CDesigner &m_designer;

@@ -8,10 +8,7 @@ class IPictureDraftInfo
 public:
     virtual ~IPictureDraftInfo() = default;
 
-    virtual size_t GetShapeCount() = 0;
+    virtual size_t GetShapeCount() const = 0;
 
-    virtual std::shared_ptr<CShape> GetShape(int index) = 0;
-
-private:
-    std::vector<std::shared_ptr<CShape>> m_shapes{};
+    virtual std::shared_ptr<CShape> GetShape(int index) const = 0;
 };

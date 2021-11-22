@@ -10,6 +10,6 @@ int main()
     auto designer = make_unique<CDesigner>(*factory);
     auto painter = make_unique<CPainter>();
     auto client = make_unique<CClient>(*designer, *painter);
-    client->GetMultiplePicture();
+    client->GetPicture();
     return 0;
 }

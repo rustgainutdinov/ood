@@ -5,7 +5,7 @@ class ICanvas;
 class CPainter
 {
 public:
-    static void DrawPicture(IPictureDraftInfo &draft, ICanvas &canvas);
+    static void DrawPicture(const IPictureDraftInfo &draft, ICanvas &canvas);
 
     ~CPainter();
 };
