@@ -1,9 +1,9 @@
 #include "lw4/painting/lib/Color.h"
 
-class ICanvas;
-
 #ifndef OOD_SHAPE_H
 #define OOD_SHAPE_H
+
+class ICanvas;
 
 class CShape
 {
