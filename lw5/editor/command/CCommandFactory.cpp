@@ -4,7 +4,7 @@
 
 #include "CCommandFactory.h"
 #include "vector"
-#include "CInsertParagraphCommand.h"
+#include "lw5/editor/command/commands/CInsertParagraphCommand.h"
 #include <sstream>
 
 using namespace std;

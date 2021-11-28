@@ -7,14 +7,11 @@
 
 
 #include "memory"
+#include "ICommandExecutor.h"
 
-class ICommand;
-
-class IUndoableCommandExecutor
+class IUndoableCommandExecutor : public ICommandExecutor
 {
 public:
-    virtual void Add(std::shared_ptr<ICommand> command) = 0;
-
     virtual void Undo() = 0;
 
     virtual void Redo() = 0;

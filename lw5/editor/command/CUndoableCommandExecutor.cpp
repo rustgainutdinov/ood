@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void CUndoableCommandExecutor::Add(shared_ptr<ICommand> command)
+void CUndoableCommandExecutor::Add(unique_ptr<ICommand> command)
 {
     if (m_currentCommandIndex + 1 != m_commands.size())
     {

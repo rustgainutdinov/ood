@@ -1,11 +1,12 @@
 #include <gtest/gtest.h>
-#include <lw5/editor/CDocument.h>
 #include <lw5/editor/content/CParagraph.h>
 #include <lw5/editor/content/CImage.h>
 #include <lw5/editor/command/CUndoableCommandExecutor.h>
 #include <lw5/editor/command/ICommand.h>
-#include <lw5/editor/command/CCommandFactory.h>
-
+#include <lw5/editor/documentItem/CDocumentItemList.h>
+#include <lw5/editor/documentItem/CDocumentItem.h>
+#include <lw5/editor/command/commands/CAddDocumentItemToListCommand.h>
+#include <lw5/editor/command/commands/CDeleteDocumentItemFromListCommand.h>
 #include <utility>
 #include "memory"
 
@@ -25,56 +26,50 @@ TEST_F(TestDocumentItem, shouldBeCoustructedWithOnlyOneParameter)
     ASSERT_THROW(make_unique<CDocumentItem>(paragraph, image), invalid_argument);
 }
 
-class TestDocument : public ::testing::Test
+
+class TestDocumentItemList : public ::testing::Test
 {
 };
 
-TEST_F(TestDocument, shouldBeAbleToModifyTitle)
+TEST_F(TestDocumentItemList, shouldAddItemsToPositionAndToEnd)
 {
-    auto document = make_unique<CDocument>();
-    document->SetTitle("some");
-    ASSERT_EQ(document->GetTitle(), "some");
-    document->SetTitle("some 1");
-    ASSERT_EQ(document->GetTitle(), "some 1");
+    auto list = make_unique<CDocumentItemList>();
+    auto item1 = make_unique<CDocumentItem>(nullopt, move(make_shared<CImage>("path 1", 1, 2)));
+    auto item2 = make_unique<CDocumentItem>(nullopt, move(make_shared<CImage>("path 2", 1, 2)));
+    auto item3 = make_unique<CDocumentItem>(nullopt, move(make_shared<CImage>("path 3", 1, 2)));
+    ASSERT_EQ(list->GetSize(), 0);
+    list->Add(move(item1));
+    list->Add(move(item2), 1);
+    list->Add(move(item3), 0);
+    ASSERT_EQ(list->GetSize(), 3);
+    ASSERT_EQ(list->Get(0).GetImage().value()->GetPath(), "path 3");
+    ASSERT_EQ(list->Get(2).GetImage().value()->GetPath(), "path 2");
+    ASSERT_EQ(list->Get(1).GetImage().value()->GetPath(), "path 1");
+    list->Get(1).GetImage().value()->Resize(10, 10);
+    ASSERT_EQ(list->Get(1).GetImage().value()->GetWidth(), 10);
+    ASSERT_EQ(list->Get(1).GetImage().value()->GetHeight(), 10);
 }
 
-TEST_F(TestDocument, shouldInsertContent)
+TEST_F(TestDocumentItemList, shouldAddItemsInExistingPositions)
 {
-    auto document = make_unique<CDocument>();
-    document->InsertParagraph("text 1");
-    document->InsertParagraph("text 2");
-    ASSERT_EQ(document->GetItemsCount(), 2);
-    ASSERT_THROW(document->GetItem(3), invalid_argument);
+    auto list = make_unique<CDocumentItemList>();
+    auto item1 = make_unique<CDocumentItem>(nullopt, move(make_shared<CImage>("path 1", 1, 2)));
+    ASSERT_THROW(list->Add(move(item1), 1), invalid_argument);
+    list->Add(move(item1), 0);
+    ASSERT_THROW(list->Add(move(item1), 2), invalid_argument);
 }
 
-TEST_F(TestDocument, shouldInsertContentToDesirtedPosition)
+TEST_F(TestDocumentItemList, shouldDeleteOnlyExistingItems)
 {
-    auto document = make_unique<CDocument>();
-    document->InsertParagraph("text 1");
-    document->InsertParagraph("text 2", 0);
-    document->InsertImage("path 3", 100, 100, 1);
-    document->InsertParagraph("text 4", 3);
-    ASSERT_EQ(document->GetItemsCount(), 4);
-    ASSERT_EQ(document->GetItem(0).GetParagraph()->GetText(), "text 2");
-    ASSERT_EQ(document->GetItem(1).GetImage()->GetPath(), "path 3");
-    ASSERT_EQ(document->GetItem(2).GetParagraph()->GetText(), "text 1");
-    ASSERT_EQ(document->GetItem(3).GetParagraph()->GetText(), "text 4");
-}
-
-TEST_F(TestDocument, shouldDeleteDocumentItem)
-{
-    auto document = make_unique<CDocument>();
-    document->InsertParagraph("text 1");
-    document->InsertImage("path 2", 100, 100);
-    document->InsertParagraph("text 3");
-    document->InsertParagraph("text 4");
-    ASSERT_EQ(document->GetItemsCount(), 4);
-    document->DeleteItem(1);
-    document->DeleteItem();
-    ASSERT_THROW(document->GetItem(2), invalid_argument);
-    ASSERT_EQ(document->GetItemsCount(), 2);
-    ASSERT_EQ(document->GetItem(0).GetParagraph()->GetText(), "text 1");
-    ASSERT_EQ(document->GetItem(1).GetParagraph()->GetText(), "text 3");
+    auto list = make_unique<CDocumentItemList>();
+    auto item1 = make_unique<CDocumentItem>(nullopt, move(make_shared<CImage>("path 1", 1, 2)));
+    auto item2 = make_unique<CDocumentItem>(nullopt, move(make_shared<CImage>("path 2", 1, 2)));
+    ASSERT_THROW(list->Delete(0), invalid_argument);
+    list->Add(move(item1));
+    list->Add(move(item2), 0);
+    ASSERT_THROW(list->Delete(2), invalid_argument);
+    list->Delete(1);
+    list->Delete(0);
 }
 
 class TestUndoableCommandExecutor : public ::testing::Test
@@ -106,8 +101,8 @@ TEST_F(TestUndoableCommandExecutor, shouldUndoCommands)
 {
     auto executor = make_unique<CUndoableCommandExecutor>();
     string mutableStr;
-    auto command1 = make_shared<MockCommand>("command1", mutableStr);
-    auto command2 = make_shared<MockCommand>("command2", mutableStr);
+    auto command1 = make_unique<MockCommand>("command1", mutableStr);
+    auto command2 = make_unique<MockCommand>("command2", mutableStr);
     executor->Add(move(command1));
     ASSERT_EQ(mutableStr, "command1executed");
     executor->Add(move(command2));
@@ -122,8 +117,8 @@ TEST_F(TestUndoableCommandExecutor, shouldRedoCommands)
 {
     auto executor = make_unique<CUndoableCommandExecutor>();
     string mutableStr;
-    auto command1 = make_shared<MockCommand>("command1", mutableStr);
-    auto command2 = make_shared<MockCommand>("command2", mutableStr);
+    auto command1 = make_unique<MockCommand>("command1", mutableStr);
+    auto command2 = make_unique<MockCommand>("command2", mutableStr);
     executor->Add(move(command1));
     ASSERT_EQ(mutableStr, "command1executed");
     executor->Add(move(command2));
@@ -142,36 +137,64 @@ TEST_F(TestUndoableCommandExecutor, shouldClearCommandListIfGoneOnAnotherBranch)
 {
     auto executor = make_unique<CUndoableCommandExecutor>();
     string mutableStr;
-    auto command1 = make_shared<MockCommand>("command1", mutableStr);
-    auto command2 = make_shared<MockCommand>("command2", mutableStr);
-    auto command3 = make_shared<MockCommand>("command3", mutableStr);
+    auto command1 = make_unique<MockCommand>("command1", mutableStr);
+    auto command2 = make_unique<MockCommand>("command2", mutableStr);
+    auto command3 = make_unique<MockCommand>("command3", mutableStr);
     executor->Add(move(command1));
     executor->Add(move(command2));
     executor->Undo();
-    executor->Add(command3);
+    executor->Add(move(command3));
     executor->Undo();
     ASSERT_EQ(mutableStr, "command3unexecuted");
     executor->Undo();
     ASSERT_EQ(mutableStr, "command1unexecuted");
 }
 
-class TestCommandFactory : public ::testing::Test
+class TestImageResource : public ::testing::Test
 {
 };
 
-TEST_F(TestCommandFactory, shouldCreateInsertParagraphCommand)
+TEST_F(TestImageResource, shouldDeleteResourceIfMarkedAsDeletedAndNotInUse)
 {
-    auto document = make_shared<CDocument>();
-    auto commandFactory = make_unique<CCommandFactory>(document);
-    auto executor = make_unique<CUndoableCommandExecutor>();
-    auto command = commandFactory->CreateCommand("InsertParagraph end some1");
-    executor->Add(move(command));
-    ASSERT_EQ(document->GetItemsCount(), 1);
-    ASSERT_EQ(document->GetItem(0).GetParagraph()->GetText(), "some1");
-    command = commandFactory->CreateCommand("InsertParagraph 0 some2");
-    executor->Add(move(command));
-    ASSERT_EQ(document->GetItemsCount(), 2);
-    ASSERT_EQ(document->GetItem(0).GetParagraph()->GetText(), "some2");
+    auto image = make_shared<CImage>("path 1", 1, 2);
+    ASSERT_EQ(image->IsResourceExist(), true);
+    image->Capture();
+    image->Release();
+
+    image->Capture();
+    image->MarkAsDeleted();
+    image->Capture();
+    image->Release();
+    image->MarkAsNotDeleted();
+    image->Release();
+
+    image->Capture();
+    image->Capture();
+    image->MarkAsDeleted();
+    image->Release();
+    ASSERT_EQ(image->IsResourceExist(), true);
+    image->Release();
+    ASSERT_EQ(image->IsResourceExist(), false);
+}
+
+class TestImageResourceCommands : public ::testing::Test
+{
+};
+
+TEST_F(TestImageResourceCommands, shouldDeleteResourceIfMarkedAsDeletedAndNotInUse)
+{
+    auto item = make_unique<CDocumentItem>(nullopt, move(make_shared<CImage>("path 1", 1, 2)));
+    auto list = make_unique<CDocumentItemList>();
+    auto command1 = make_unique<CAddDocumentItemToListCommand>(*list, move(item), nullopt);
+    command1->Execute();
+    auto resource = list->Get(0).GetResource();
+    ASSERT_EQ(resource.value()->IsResourceExist(), true);
+    command1.reset();
+    ASSERT_EQ(resource.value()->IsResourceExist(), true);
+    auto command2 = make_unique<CDeleteDocumentItemFromListCommand>(*list, 0);
+    command2->Execute();
+    command2.reset();
+    ASSERT_EQ(resource.value()->IsResourceExist(), false);
 }
 
 int main(int argc, char *argv[])

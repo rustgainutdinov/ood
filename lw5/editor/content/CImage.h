@@ -6,12 +6,16 @@
 #define OOD_CIMAGE_H
 
 
-#include "IImage.h"
+#include "IImageResource.h"
 #include "string"
 
-class CImage : public IImage
+class CImage : public IImageResource
 {
 public:
+    CImage(Path path, int width, int height);
+
+    ~CImage() override;
+
     Path GetPath() const override;
 
     int GetWidth() const override;
@@ -20,12 +24,23 @@ public:
 
     void Resize(int width, int height) override;
 
-    CImage(Path path, int width, int height);
+    void Capture() override;
+
+    void Release() override;
+
+    void MarkAsDeleted() override;
+
+    void MarkAsNotDeleted() override;
+
+    bool IsResourceExist() override;
 
 private:
     int m_width;
     int m_height;
     Path m_path;
+    int m_placesOfUse = 0;
+    bool m_isDeleted = false;
+    bool m_resourceExist = true;
 };
 
 

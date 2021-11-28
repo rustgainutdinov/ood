@@ -12,14 +12,14 @@
 class CUndoableCommandExecutor : public IUndoableCommandExecutor
 {
 public:
-    void Add(std::shared_ptr<ICommand> command) override;
+    void Add(std::unique_ptr<ICommand> command) override;
 
     void Undo() override;
 
     void Redo() override;
 
 private:
-    std::vector<std::shared_ptr<ICommand>> m_commands{};
+    std::vector<std::unique_ptr<ICommand>> m_commands{};
     size_t m_currentCommandIndex = -1;
 };
 
