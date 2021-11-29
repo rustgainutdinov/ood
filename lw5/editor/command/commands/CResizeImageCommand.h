@@ -7,13 +7,14 @@
 
 
 #include "lw5/editor/command/ICommand.h"
+#include "memory"
 
 class IImageResource;
 
 class CResizeImageCommand : public ICommand
 {
 public:
-    CResizeImageCommand(IImageResource &image, int width, int height);
+    CResizeImageCommand(std::shared_ptr<IImageResource> image, int width, int height);
 
     ~CResizeImageCommand() override;
 
@@ -22,7 +23,7 @@ public:
     void CancelExecution() override;
 
 private:
-    IImageResource &m_image;
+    std::shared_ptr<IImageResource> m_image;
     int m_width;
     int m_height;
     int m_baseWidth;

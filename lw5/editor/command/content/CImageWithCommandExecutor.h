@@ -14,7 +14,7 @@ class ICommandExecutor;
 class CImageWithCommandExecutor : public IImageResource
 {
 public:
-    CImageWithCommandExecutor(std::unique_ptr<IImageResource> imageSource, ICommandExecutor &commandExecutor);
+    CImageWithCommandExecutor(std::shared_ptr<IImageResource> imageSource, ICommandExecutor &commandExecutor);
 
     Path GetPath() const override;
 
@@ -30,8 +30,12 @@ public:
 
     void MarkAsDeleted() override;
 
+    void MarkAsNotDeleted() override;
+
+    bool IsResourceExist() override;
+
 private:
-    std::unique_ptr<IImageResource> m_imageSource;
+    std::shared_ptr<IImageResource> m_imageSource;
     ICommandExecutor &m_commandExecutor;
 };
 

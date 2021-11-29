@@ -7,6 +7,7 @@
 #include <lw5/editor/documentItem/CDocumentItem.h>
 #include <lw5/editor/command/commands/CAddDocumentItemToListCommand.h>
 #include <lw5/editor/command/commands/CDeleteDocumentItemFromListCommand.h>
+#include <lw5/editor/command/content/CImageWithCommandExecutor.h>
 #include <utility>
 #include "memory"
 
@@ -195,6 +196,26 @@ TEST_F(TestImageResourceCommands, shouldDeleteResourceIfMarkedAsDeletedAndNotInU
     command2->Execute();
     command2.reset();
     ASSERT_EQ(resource.value()->IsResourceExist(), false);
+}
+
+class TestImageWithCommandExecutor : public ::testing::Test
+{
+};
+
+TEST_F(TestImageWithCommandExecutor, shouldGenerateCommandsIfWasModified)
+{
+    auto executor = make_unique<CUndoableCommandExecutor>();
+    auto baseImage = make_unique<CImage>("path 1", 1, 2);
+    auto image = make_unique<CImageWithCommandExecutor>(move(baseImage), *executor);
+    image->Resize(3, 4);
+    ASSERT_EQ(image->GetWidth(), 3);
+    ASSERT_EQ(image->GetHeight(), 4);
+    executor->Undo();
+    ASSERT_EQ(image->GetWidth(), 1);
+    ASSERT_EQ(image->GetHeight(), 2);
+    executor->Redo();
+    ASSERT_EQ(image->GetWidth(), 3);
+    ASSERT_EQ(image->GetHeight(), 4);
 }
 
 int main(int argc, char *argv[])

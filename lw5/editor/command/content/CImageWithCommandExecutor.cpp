@@ -8,7 +8,7 @@
 
 using namespace std;
 
-CImageWithCommandExecutor::CImageWithCommandExecutor(std::unique_ptr<IImageResource> imageSource,
+CImageWithCommandExecutor::CImageWithCommandExecutor(std::shared_ptr<IImageResource> imageSource,
                                                      ICommandExecutor &commandExecutor) :
         m_imageSource(move(imageSource)), m_commandExecutor(commandExecutor)
 {}
@@ -30,7 +30,7 @@ int CImageWithCommandExecutor::GetHeight() const
 
 void CImageWithCommandExecutor::Resize(int width, int height)
 {
-    auto command = make_unique<CResizeImageCommand>(*m_imageSource, width, height);
+    auto command = make_unique<CResizeImageCommand>(m_imageSource, width, height);
     m_commandExecutor.Add(move(command));
 }
 
@@ -47,4 +47,14 @@ void CImageWithCommandExecutor::Release()
 void CImageWithCommandExecutor::MarkAsDeleted()
 {
     m_imageSource->MarkAsDeleted();
+}
+
+void CImageWithCommandExecutor::MarkAsNotDeleted()
+{
+    m_imageSource->MarkAsNotDeleted();
+}
+
+bool CImageWithCommandExecutor::IsResourceExist()
+{
+    return m_imageSource->IsResourceExist();
 }
