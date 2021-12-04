@@ -3,8 +3,11 @@
 #include "CDocument.h"
 #include "memory"
 #include "lw5/editor/documentItem/CDocumentItemList.h"
+#include "lw5/editor/documentItem/CDocumentItem.h"
 #include "lw5/editor/command/CUndoableCommandExecutor.h"
 #include "lw5/editor/command/documentItem/CDocumentItemListWithCommandExecutor.h"
+#include "lw5/editor/command/content/CImageWithCommandExecutor.h"
+#include "lw5/editor/command/ICommand.h"
 
 using namespace std;
 
@@ -20,32 +23,46 @@ void CDocument::SetTitle(const string &title)
 
 std::shared_ptr<IParagraph> CDocument::InsertParagraph(const string &text, std::optional<size_t> position)
 {
-    return std::shared_ptr<IParagraph>();
+    return nullptr;
 }
 
 std::shared_ptr<IImage> CDocument::InsertImage(const Path &path, int width, int height, std::optional<size_t> position)
 {
-    return std::shared_ptr<IImage>();
+    auto baseImage = make_shared<CImage>("path 1", 1, 2);
+    auto image = make_shared<CImageWithCommandExecutor>(baseImage, *m_executor);
+    auto item = make_unique<CDocumentItem>(nullopt, image);
+    m_list->Add(move(item), position);
+    return image;
 }
 
 size_t CDocument::GetItemsCount() const
 {
-    return 0;
+    return m_list->GetSize();
 }
 
-IDocumentItem CDocument::GetItem(size_t index)
+IDocumentItem &CDocument::GetItem(size_t index)
 {
-    return IDocumentItem();
+    return m_list->Get(index);
 }
 
-void CDocument::DeleteItem(std::optional<size_t> position)
+void CDocument::DeleteItem(size_t position)
 {
-
+    m_list->Delete(position);
 }
 
 CDocument::CDocument()
 {
-    auto list = make_unique<CDocumentItemList>();
+    auto list = make_shared<CDocumentItemList>();
     m_executor = make_unique<CUndoableCommandExecutor>();
-    m_list = make_unique<CDocumentItemListWithCommandExecutor>(*list, *m_executor);
+    m_list = make_unique<CDocumentItemListWithCommandExecutor>(list, *m_executor);
+}
+
+void CDocument::Undo()
+{
+    m_executor->Undo();
+}
+
+void CDocument::Redo()
+{
+    m_executor->Redo();
 }

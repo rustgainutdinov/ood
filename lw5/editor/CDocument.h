@@ -2,7 +2,6 @@
 #define OOD_CDOCUMENT_H
 
 
-#include <lw5/editor/documentItem/IDocumentItem.h>
 #include "IDocument.h"
 #include "vector"
 
@@ -23,13 +22,17 @@ public:
 
     size_t GetItemsCount() const override;
 
-    IDocumentItem GetItem(size_t index) override;
+    IDocumentItem &GetItem(size_t index) override;
 
-    void DeleteItem(std::optional<size_t> position) override;
+    void DeleteItem(size_t position) override;
 
     std::string GetTitle() const override;
 
     void SetTitle(const std::string &title) override;
+
+    void Undo() override;
+
+    void Redo() override;
 
 private:
     std::string m_title{};

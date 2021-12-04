@@ -8,7 +8,6 @@
 #include <lw5/editor/content/IParagraph.h>
 
 #include <utility>
-#include <lw5/editor/content/CImage.h>
 #include "CDocumentItem.h"
 
 using namespace std;
@@ -24,7 +23,7 @@ optional<shared_ptr<IParagraph>> CDocumentItem::GetParagraph()
 }
 
 CDocumentItem::CDocumentItem(optional<shared_ptr<CParagraph>> paragraph,
-                             optional<shared_ptr<CImage>> image) : m_image(move(image)),
+                             optional<shared_ptr<IImageResource>> image) : m_image(move(image)),
                                                                    m_paragraph(move(paragraph))
 {
     if (m_paragraph == nullopt && m_image == nullopt || m_paragraph != nullopt && m_image != nullopt)

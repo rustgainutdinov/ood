@@ -12,6 +12,7 @@
 #include "memory"
 #include "optional"
 #include "lw5/editor/command/documentItem/CDocumentItemListWithCommandExecutor.h"
+#include "lw5/editor/CDocument.h"
 
 using namespace std;
 
@@ -188,8 +189,8 @@ class CTestDocumentItem : public CDocumentItem
 {
 public:
     explicit CTestDocumentItem(optional<shared_ptr<CParagraph>> paragraph = nullopt,
-                               optional<shared_ptr<CImage>> image = nullopt) : CDocumentItem(move(paragraph),
-                                                                                             move(image))
+                               optional<shared_ptr<IImageResource>> image = nullopt) : CDocumentItem(move(paragraph),
+                                                                                                     move(image))
     {
     }
 
@@ -224,7 +225,7 @@ class TestImageWithCommandExecutor : public ::testing::Test
 {
 };
 
-TEST_F(TestImageWithCommandExecutor, shouldGenerateCommandsIfWasModified)
+TEST_F(TestImageWithCommandExecutor, shouldBeUndoable)
 {
     auto executor = make_unique<CUndoableCommandExecutor>();
     auto baseImage = make_unique<CImage>("path 1", 1, 2);
@@ -244,7 +245,7 @@ class TestDocumentItemListWithCommandExecutor : public ::testing::Test
 {
 };
 
-TEST_F(TestDocumentItemListWithCommandExecutor, shouldGenerateCommandsIfWasModified)
+TEST_F(TestDocumentItemListWithCommandExecutor, shouldBeUndoable)
 {
     auto list = make_shared<CDocumentItemList>();
     auto executor = make_unique<CUndoableCommandExecutor>();
@@ -269,6 +270,29 @@ TEST_F(TestDocumentItemListWithCommandExecutor, shouldGenerateCommandsIfWasModif
     ASSERT_EQ(listWithCommandExecutor->GetSize(), 1);
     executor->Redo();
     ASSERT_EQ(listWithCommandExecutor->GetSize(), 2);
+}
+
+class TestDocument : public ::testing::Test
+{
+};
+
+TEST_F(TestDocument, shouldBeUndoable)
+{
+    auto document = make_unique<CDocument>();
+    document->InsertImage("path", 2, 2);
+    ASSERT_EQ(document->GetItemsCount(), 1);
+    document->InsertImage("path 2", 2, 2);
+    ASSERT_EQ(document->GetItemsCount(), 2);
+    document->Undo();
+    ASSERT_EQ(document->GetItemsCount(), 1);
+    document->Redo();
+    ASSERT_EQ(document->GetItemsCount(), 2);
+    document->Undo();
+    document->Undo();
+    ASSERT_EQ(document->GetItemsCount(), 0);
+    document->Redo();
+    document->Redo();
+    ASSERT_EQ(document->GetItemsCount(), 2);
 }
 
 int main(int argc, char *argv[])

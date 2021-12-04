@@ -13,7 +13,7 @@ class CParagraph;
 
 class IParagraph;
 
-class CImage;
+class IImageResource;
 
 class IImage;
 
@@ -23,7 +23,7 @@ class CDocumentItem : public IDocumentItem
 {
 public:
     explicit CDocumentItem(std::optional<std::shared_ptr<CParagraph>> paragraph = std::nullopt,
-                           std::optional<std::shared_ptr<CImage>> image = std::nullopt);
+                           std::optional<std::shared_ptr<IImageResource>> image = std::nullopt);
 
     std::optional<std::shared_ptr<IImage>> GetImage() override;
 
@@ -39,7 +39,7 @@ public:
 
 protected:
     std::optional<std::shared_ptr<CParagraph>> m_paragraph;
-    std::optional<std::shared_ptr<CImage>> m_image;
+    std::optional<std::shared_ptr<IImageResource>> m_image;
 };
 
 
