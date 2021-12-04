@@ -21,12 +21,10 @@ void CDocumentItemList::Add(unique_ptr<CDocumentItem> item, optional<size_t> pos
     m_itemsList.insert(m_itemsList.begin() + position.value(), move(item));
 }
 
-std::unique_ptr<CDocumentItem> CDocumentItemList::Delete(size_t position)
+void CDocumentItemList::Delete(size_t position)
 {
     AssertPositionInStructureExists(position);
-    auto item = move(m_itemsList[position]);
     m_itemsList.erase(m_itemsList.begin() + position);
-    return item;
 }
 
 CDocumentItem &CDocumentItemList::Get(size_t position)
@@ -47,4 +45,10 @@ void CDocumentItemList::AssertPositionInStructureExists(size_t position) const
 size_t CDocumentItemList::GetSize()
 {
     return m_itemsList.size();
+}
+
+std::unique_ptr<CDocumentItem> CDocumentItemList::GetPtr(size_t position)
+{
+    AssertPositionInStructureExists(position);
+    return move(m_itemsList[position]);
 }

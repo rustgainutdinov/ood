@@ -3,9 +3,10 @@
 //
 
 #include "CAddDocumentItemToListCommand.h"
+
+#include <utility>
 #include "lw5/editor/documentItem/IDocumentItemList.h"
 #include "lw5/editor/documentItem/CDocumentItem.h"
-#include "lw5/editor/content/IResource.h"
 #include "lw5/editor/content/IImageResource.h"
 
 using namespace std;
@@ -16,29 +17,17 @@ CAddDocumentItemToListCommand::CAddDocumentItemToListCommand(IDocumentItemList &
                                                              optional<size_t> position) :
         m_list(list), m_item(move(item)), m_position(position)
 {
-    if (m_item->GetResource() != nullopt)
-    {
-        m_item->GetResource().value()->Capture();
-    }
+    m_item->TryToCapture();
 }
 
 CAddDocumentItemToListCommand::~CAddDocumentItemToListCommand()
 {
     if (m_item != nullptr)
     {
-        if (m_item->GetResource() == nullopt)
-        {
-            return;
-        }
-        m_item->GetResource().value()->Release();
+        m_item->TryToRelease();
         return;
     }
-    auto position = m_position != nullopt ? m_position.value() : m_list.GetSize() - 1;
-    if (m_list.Get(position).GetResource() != nullopt)
-    {
-        m_list.Get(position).GetResource().value()->Release();
-        return;
-    }
+    m_list.Get(GetPosition()).TryToRelease();
 }
 
 void CAddDocumentItemToListCommand::Execute()
@@ -47,19 +36,23 @@ void CAddDocumentItemToListCommand::Execute()
     {
         return;
     }
-    if (m_item->GetResource() != nullopt)
-    {
-        m_item->GetResource().value()->MarkAsNotDeleted();
-    }
+    m_item->TryToMarkAsNotDeleted();
     m_list.Add(move(m_item), m_position);
 }
 
 void CAddDocumentItemToListCommand::CancelExecution()
 {
-    auto position = m_position != nullopt ? m_position.value() : m_list.GetSize() - 1;
-    m_item = m_list.Delete(position);
-    if (m_item->GetResource() != nullopt)
+    if (m_item != nullptr)
     {
-        m_item->GetResource().value()->MarkAsDeleted();
+        return;
     }
+    auto position = GetPosition();
+    m_item = m_list.GetPtr(position);
+    m_list.Delete(position);
+    m_item->TryToMarkAsDeleted();
+}
+
+size_t CAddDocumentItemToListCommand::GetPosition()
+{
+    return m_position != nullopt ? m_position.value() : m_list.GetSize() - 1;
 }

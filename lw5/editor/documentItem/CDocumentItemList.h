@@ -14,9 +14,11 @@ class CDocumentItemList : public IDocumentItemList
 public:
     void Add(std::unique_ptr<CDocumentItem> item, std::optional<size_t> position = std::nullopt) override;
 
-    std::unique_ptr<CDocumentItem> Delete(size_t position) override;
+    void Delete(size_t position) override;
 
     CDocumentItem &Get(size_t position) override;
+
+    std::unique_ptr<CDocumentItem> GetPtr(size_t position) override;
 
     size_t GetSize() override;
 

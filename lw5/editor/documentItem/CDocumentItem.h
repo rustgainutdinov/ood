@@ -6,6 +6,7 @@
 #define OOD_CDOCUMENTITEM_H
 
 #include "memory"
+#include "IDocumentItem.h"
 #include <optional>
 
 class CParagraph;
@@ -16,21 +17,27 @@ class CImage;
 
 class IImage;
 
-class IResource;
+class IImageResource;
 
-class CDocumentItem
+class CDocumentItem : public IDocumentItem
 {
 public:
     explicit CDocumentItem(std::optional<std::shared_ptr<CParagraph>> paragraph = std::nullopt,
                            std::optional<std::shared_ptr<CImage>> image = std::nullopt);
 
-    std::optional<std::shared_ptr<IImage>> GetImage();
+    std::optional<std::shared_ptr<IImage>> GetImage() override;
 
-    std::optional<std::shared_ptr<IParagraph>> GetParagraph();
+    std::optional<std::shared_ptr<IParagraph>> GetParagraph() override;
 
-    std::optional<std::shared_ptr<IResource>> GetResource();
+    void TryToCapture();
 
-private:
+    void TryToRelease();
+
+    void TryToMarkAsDeleted();
+
+    void TryToMarkAsNotDeleted();
+
+protected:
     std::optional<std::shared_ptr<CParagraph>> m_paragraph;
     std::optional<std::shared_ptr<CImage>> m_image;
 };

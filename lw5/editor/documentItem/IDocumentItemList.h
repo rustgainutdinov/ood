@@ -18,9 +18,11 @@ public:
 
     virtual void Add(std::unique_ptr<CDocumentItem> item, std::optional<size_t> position = std::nullopt) = 0;
 
-    virtual std::unique_ptr<CDocumentItem> Delete(size_t position) = 0;
+    virtual void Delete(size_t position) = 0;
 
     virtual CDocumentItem &Get(size_t position) = 0;
+
+    virtual std::unique_ptr<CDocumentItem> GetPtr(size_t position) = 0;
 
     virtual size_t GetSize() = 0;
 };

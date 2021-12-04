@@ -19,7 +19,8 @@ class IDocumentItemList;
 class CAddDocumentItemToListCommand : public ICommand
 {
 public:
-    CAddDocumentItemToListCommand(IDocumentItemList &list, std::unique_ptr<CDocumentItem> item, std::optional<size_t> position = std::nullopt);
+    CAddDocumentItemToListCommand(IDocumentItemList &list, std::unique_ptr<CDocumentItem> item,
+                                  std::optional<size_t> position = std::nullopt);
 
     ~CAddDocumentItemToListCommand() override;
 
@@ -28,6 +29,8 @@ public:
     void CancelExecution() override;
 
 private:
+    size_t GetPosition();
+
     IDocumentItemList &m_list;
     std::unique_ptr<CDocumentItem> m_item;
     std::optional<size_t> m_position;

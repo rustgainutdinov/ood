@@ -15,17 +15,12 @@ using namespace std;
 
 optional<shared_ptr<IImage>> CDocumentItem::GetImage()
 {
-    return reinterpret_cast<optional<shared_ptr<IImageResource>> &>(m_image);
+    return reinterpret_cast<optional<shared_ptr<IImage>> &>(m_image);
 }
 
 optional<shared_ptr<IParagraph>> CDocumentItem::GetParagraph()
 {
     return reinterpret_cast<optional<shared_ptr<IParagraph>> &>(m_paragraph);
-}
-
-optional<shared_ptr<IResource>> CDocumentItem::GetResource()
-{
-    return reinterpret_cast<optional<shared_ptr<IImageResource>> &>(m_image);
 }
 
 CDocumentItem::CDocumentItem(optional<shared_ptr<CParagraph>> paragraph,
@@ -35,5 +30,37 @@ CDocumentItem::CDocumentItem(optional<shared_ptr<CParagraph>> paragraph,
     if (m_paragraph == nullopt && m_image == nullopt || m_paragraph != nullopt && m_image != nullopt)
     {
         throw invalid_argument("paragraph can contain only one content item");
+    }
+}
+
+void CDocumentItem::TryToCapture()
+{
+    if (m_image != nullopt)
+    {
+        m_image.value()->Capture();
+    }
+}
+
+void CDocumentItem::TryToRelease()
+{
+    if (m_image != nullopt)
+    {
+        m_image.value()->Release();
+    }
+}
+
+void CDocumentItem::TryToMarkAsDeleted()
+{
+    if (m_image != nullopt)
+    {
+        m_image.value()->MarkAsDeleted();
+    }
+}
+
+void CDocumentItem::TryToMarkAsNotDeleted()
+{
+    if (m_image != nullopt)
+    {
+        m_image.value()->MarkAsNotDeleted();
     }
 }

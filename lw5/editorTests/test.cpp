@@ -10,6 +10,8 @@
 #include <lw5/editor/command/content/CImageWithCommandExecutor.h>
 #include <utility>
 #include "memory"
+#include "optional"
+#include "lw5/editor/command/documentItem/CDocumentItemListWithCommandExecutor.h"
 
 using namespace std;
 
@@ -182,20 +184,40 @@ class TestImageResourceCommands : public ::testing::Test
 {
 };
 
+class CTestDocumentItem : public CDocumentItem
+{
+public:
+    explicit CTestDocumentItem(optional<shared_ptr<CParagraph>> paragraph = nullopt,
+                               optional<shared_ptr<CImage>> image = nullopt) : CDocumentItem(move(paragraph),
+                                                                                             move(image))
+    {
+    }
+
+    bool IsResourceExist()
+    {
+        if (m_image != nullopt)
+        {
+            return m_image.value()->IsResourceExist();
+        }
+        return false;
+    }
+};
+
 TEST_F(TestImageResourceCommands, shouldDeleteResourceIfMarkedAsDeletedAndNotInUse)
 {
-    auto item = make_unique<CDocumentItem>(nullopt, move(make_shared<CImage>("path 1", 1, 2)));
+    auto item = make_unique<CTestDocumentItem>(nullopt, move(make_shared<CImage>("path 1", 1, 2)));
     auto list = make_unique<CDocumentItemList>();
     auto command1 = make_unique<CAddDocumentItemToListCommand>(*list, move(item), nullopt);
     command1->Execute();
-    auto resource = list->Get(0).GetResource();
-    ASSERT_EQ(resource.value()->IsResourceExist(), true);
+    auto documentItem = reinterpret_cast<CTestDocumentItem &>(list->Get(0));
+
+    ASSERT_EQ(documentItem.IsResourceExist(), true);
     command1.reset();
-    ASSERT_EQ(resource.value()->IsResourceExist(), true);
+    ASSERT_EQ(documentItem.IsResourceExist(), true);
     auto command2 = make_unique<CDeleteDocumentItemFromListCommand>(*list, 0);
     command2->Execute();
     command2.reset();
-    ASSERT_EQ(resource.value()->IsResourceExist(), false);
+    ASSERT_EQ(documentItem.IsResourceExist(), false);
 }
 
 class TestImageWithCommandExecutor : public ::testing::Test
@@ -216,6 +238,28 @@ TEST_F(TestImageWithCommandExecutor, shouldGenerateCommandsIfWasModified)
     executor->Redo();
     ASSERT_EQ(image->GetWidth(), 3);
     ASSERT_EQ(image->GetHeight(), 4);
+}
+
+class TestDocumentItemListWithCommandExecutor : public ::testing::Test
+{
+};
+
+TEST_F(TestDocumentItemListWithCommandExecutor, shouldGenerateCommandsIfWasModified)
+{
+    auto list = make_unique<CDocumentItemList>();
+    auto executor = make_unique<CUndoableCommandExecutor>();
+    auto listWithCommandExecutor = make_unique<CDocumentItemListWithCommandExecutor>(*list, *executor);
+    auto baseImage = make_shared<CImage>("path 1", 1, 2);
+    auto item = make_unique<CDocumentItem>(nullopt, move(baseImage));
+    listWithCommandExecutor->Add(move(item));
+    ASSERT_EQ(listWithCommandExecutor->GetSize(), 1);
+    ASSERT_EQ(listWithCommandExecutor->Get(0).GetImage().value()->GetPath(), "path 1");
+
+    auto baseImage2 = make_shared<CImage>("path 2", 1, 2);
+    auto item2 = make_unique<CDocumentItem>(nullopt, move(baseImage2));
+    listWithCommandExecutor->Add(move(item2));
+    ASSERT_EQ(listWithCommandExecutor->GetSize(), 2);
+    ASSERT_EQ(listWithCommandExecutor->Get(1).GetImage().value()->GetPath(), "path 2");
 }
 
 int main(int argc, char *argv[])
