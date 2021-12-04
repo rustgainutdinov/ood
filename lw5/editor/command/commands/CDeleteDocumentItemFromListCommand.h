@@ -19,7 +19,7 @@ class IDocumentItemList;
 class CDeleteDocumentItemFromListCommand : public ICommand
 {
 public:
-    CDeleteDocumentItemFromListCommand(IDocumentItemList &list, size_t position);
+    CDeleteDocumentItemFromListCommand(std::shared_ptr<IDocumentItemList> list, size_t position);
 
     ~CDeleteDocumentItemFromListCommand() override;
 
@@ -28,7 +28,7 @@ public:
     void CancelExecution() override;
 
 private:
-    IDocumentItemList &m_list;
+    std::shared_ptr<IDocumentItemList> m_list;
     std::unique_ptr<CDocumentItem> m_item{};
     size_t m_position;
 };

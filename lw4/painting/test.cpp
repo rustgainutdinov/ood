@@ -10,8 +10,8 @@
 
 using namespace std;
 
-const char *const ellipseElementFormat = "ellipse %s %d %d %d %d";
-const char *const lineElementFormat = "line %s %d %d %d %d";
+const char *const ellipseElementFormat = "ellipse %m_executor %d %d %d %d";
+const char *const lineElementFormat = "line %m_executor %d %d %d %d";
 
 string GetColorFromString(const Color color)
 {

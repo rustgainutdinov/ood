@@ -12,10 +12,10 @@
 using namespace std;
 
 
-CAddDocumentItemToListCommand::CAddDocumentItemToListCommand(IDocumentItemList &list,
+CAddDocumentItemToListCommand::CAddDocumentItemToListCommand(std::shared_ptr<IDocumentItemList> list,
                                                              unique_ptr<CDocumentItem> item,
                                                              optional<size_t> position) :
-        m_list(list), m_item(move(item)), m_position(position)
+        m_list(move(list)), m_item(move(item)), m_position(position)
 {
     m_item->TryToCapture();
 }
@@ -27,7 +27,7 @@ CAddDocumentItemToListCommand::~CAddDocumentItemToListCommand()
         m_item->TryToRelease();
         return;
     }
-    m_list.Get(GetPosition()).TryToRelease();
+    m_list->Get(GetPosition()).TryToRelease();
 }
 
 void CAddDocumentItemToListCommand::Execute()
@@ -37,7 +37,7 @@ void CAddDocumentItemToListCommand::Execute()
         return;
     }
     m_item->TryToMarkAsNotDeleted();
-    m_list.Add(move(m_item), m_position);
+    m_list->Add(move(m_item), m_position);
 }
 
 void CAddDocumentItemToListCommand::CancelExecution()
@@ -47,12 +47,12 @@ void CAddDocumentItemToListCommand::CancelExecution()
         return;
     }
     auto position = GetPosition();
-    m_item = m_list.GetPtr(position);
-    m_list.Delete(position);
+    m_item = m_list->GetPtr(position);
+    m_list->Delete(position);
     m_item->TryToMarkAsDeleted();
 }
 
 size_t CAddDocumentItemToListCommand::GetPosition()
 {
-    return m_position != nullopt ? m_position.value() : m_list.GetSize() - 1;
+    return m_position != nullopt ? m_position.value() : m_list->GetSize() - 1;
 }

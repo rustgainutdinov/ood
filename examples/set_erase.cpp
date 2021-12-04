@@ -17,7 +17,7 @@ void printset(myset s)
         cout << " [" << iter << "]";
 //        if (i == 2)
 //        {
-//            s.erase(iter);
+//            m_executor.erase(iter);
 //        }
         i++;
     }

@@ -3,6 +3,8 @@
 //
 
 #include "CDocumentItemListWithCommandExecutor.h"
+
+#include <utility>
 #include "lw5/editor/command/ICommandExecutor.h"
 #include "lw5/editor/command/commands/CDeleteDocumentItemFromListCommand.h"
 #include "lw5/editor/command/commands/CAddDocumentItemToListCommand.h"
@@ -11,8 +13,8 @@
 using namespace std;
 
 CDocumentItemListWithCommandExecutor::CDocumentItemListWithCommandExecutor(
-        IDocumentItemList &documentItemList, ICommandExecutor &commandExecutor) :
-        m_documentItemList(documentItemList), m_commandExecutor(commandExecutor)
+        shared_ptr<IDocumentItemList> documentItemList, ICommandExecutor &commandExecutor) :
+        m_documentItemList(move(documentItemList)), m_commandExecutor(commandExecutor)
 {
 }
 
@@ -30,15 +32,15 @@ void CDocumentItemListWithCommandExecutor::Delete(size_t position)
 
 CDocumentItem &CDocumentItemListWithCommandExecutor::Get(size_t position)
 {
-    return m_documentItemList.Get(position);
+    return m_documentItemList->Get(position);
 }
 
 size_t CDocumentItemListWithCommandExecutor::GetSize()
 {
-    return m_documentItemList.GetSize();
+    return m_documentItemList->GetSize();
 }
 
 unique_ptr<CDocumentItem> CDocumentItemListWithCommandExecutor::GetPtr(size_t position)
 {
-    return move(m_documentItemList.GetPtr(position));
+    return move(m_documentItemList->GetPtr(position));
 }

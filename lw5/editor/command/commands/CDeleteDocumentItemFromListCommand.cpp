@@ -11,11 +11,11 @@
 
 using namespace std;
 
-CDeleteDocumentItemFromListCommand::CDeleteDocumentItemFromListCommand(IDocumentItemList &list,
+CDeleteDocumentItemFromListCommand::CDeleteDocumentItemFromListCommand(std::shared_ptr<IDocumentItemList> list,
                                                                        size_t position) :
-        m_list(list), m_position(position)
+        m_list(move(list)), m_position(position)
 {
-    m_list.Get(m_position).TryToCapture();
+    m_list->Get(m_position).TryToCapture();
 }
 
 CDeleteDocumentItemFromListCommand::~CDeleteDocumentItemFromListCommand()
@@ -25,18 +25,18 @@ CDeleteDocumentItemFromListCommand::~CDeleteDocumentItemFromListCommand()
         m_item->TryToRelease();
         return;
     }
-    m_list.Get(m_position).TryToRelease();
+    m_list->Get(m_position).TryToRelease();
 }
 
 void CDeleteDocumentItemFromListCommand::Execute()
 {
-    m_item = m_list.GetPtr(m_position);
-    m_list.Delete(m_position);
+    m_item = m_list->GetPtr(m_position);
+    m_list->Delete(m_position);
     m_item->TryToMarkAsDeleted();
 }
 
 void CDeleteDocumentItemFromListCommand::CancelExecution()
 {
     m_item->TryToMarkAsNotDeleted();
-    m_list.Add(move(m_item), m_position);
+    m_list->Add(move(m_item), m_position);
 }

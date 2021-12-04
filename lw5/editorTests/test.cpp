@@ -206,15 +206,15 @@ public:
 TEST_F(TestImageResourceCommands, shouldDeleteResourceIfMarkedAsDeletedAndNotInUse)
 {
     auto item = make_unique<CTestDocumentItem>(nullopt, move(make_shared<CImage>("path 1", 1, 2)));
-    auto list = make_unique<CDocumentItemList>();
-    auto command1 = make_unique<CAddDocumentItemToListCommand>(*list, move(item), nullopt);
+    auto list = make_shared<CDocumentItemList>();
+    auto command1 = make_unique<CAddDocumentItemToListCommand>(list, move(item), nullopt);
     command1->Execute();
     auto documentItem = reinterpret_cast<CTestDocumentItem &>(list->Get(0));
 
     ASSERT_EQ(documentItem.IsResourceExist(), true);
     command1.reset();
     ASSERT_EQ(documentItem.IsResourceExist(), true);
-    auto command2 = make_unique<CDeleteDocumentItemFromListCommand>(*list, 0);
+    auto command2 = make_unique<CDeleteDocumentItemFromListCommand>(list, 0);
     command2->Execute();
     command2.reset();
     ASSERT_EQ(documentItem.IsResourceExist(), false);
@@ -246,9 +246,9 @@ class TestDocumentItemListWithCommandExecutor : public ::testing::Test
 
 TEST_F(TestDocumentItemListWithCommandExecutor, shouldGenerateCommandsIfWasModified)
 {
-    auto list = make_unique<CDocumentItemList>();
+    auto list = make_shared<CDocumentItemList>();
     auto executor = make_unique<CUndoableCommandExecutor>();
-    auto listWithCommandExecutor = make_unique<CDocumentItemListWithCommandExecutor>(*list, *executor);
+    auto listWithCommandExecutor = make_unique<CDocumentItemListWithCommandExecutor>(list, *executor);
     auto baseImage = make_shared<CImage>("path 1", 1, 2);
     auto item = make_unique<CDocumentItem>(nullopt, move(baseImage));
     listWithCommandExecutor->Add(move(item));
@@ -260,6 +260,15 @@ TEST_F(TestDocumentItemListWithCommandExecutor, shouldGenerateCommandsIfWasModif
     listWithCommandExecutor->Add(move(item2));
     ASSERT_EQ(listWithCommandExecutor->GetSize(), 2);
     ASSERT_EQ(listWithCommandExecutor->Get(1).GetImage().value()->GetPath(), "path 2");
+
+    executor->Undo();
+    ASSERT_EQ(listWithCommandExecutor->GetSize(), 1);
+    executor->Undo();
+    ASSERT_EQ(listWithCommandExecutor->GetSize(), 0);
+    executor->Redo();
+    ASSERT_EQ(listWithCommandExecutor->GetSize(), 1);
+    executor->Redo();
+    ASSERT_EQ(listWithCommandExecutor->GetSize(), 2);
 }
 
 int main(int argc, char *argv[])

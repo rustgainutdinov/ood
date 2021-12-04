@@ -2,51 +2,11 @@
 #include <lw5/editor/content/CImage.h>
 #include "CDocument.h"
 #include "memory"
+#include "lw5/editor/documentItem/CDocumentItemList.h"
+#include "lw5/editor/command/CUndoableCommandExecutor.h"
+#include "lw5/editor/command/documentItem/CDocumentItemListWithCommandExecutor.h"
 
 using namespace std;
-
-shared_ptr<IParagraph> CDocument::InsertParagraph(const string &text, optional<size_t> position)
-{
-    auto paragraph = make_shared<CParagraph>(text);
-    CDocumentItem item = CDocumentItem(paragraph);
-    InsertDocumentItem(item, position);
-    return paragraph;
-}
-
-shared_ptr<IImage> CDocument::InsertImage(const Path &path, int width, int height, optional<size_t> position)
-{
-    auto image = make_shared<CImage>(path, width, height);
-    CDocumentItem item = CDocumentItem(nullopt, image);
-    InsertDocumentItem(item, position);
-    return image;
-}
-
-size_t CDocument::GetItemsCount() const
-{
-    return m_structure.size();
-}
-
-CConstDocumentItem CDocument::GetItem(size_t index) const
-{
-    AssertPositionInStructureExists(index);
-    return m_structure[index];
-}
-
-CDocumentItem CDocument::GetItem(size_t index)
-{
-    AssertPositionInStructureExists(index);
-    return m_structure[index];
-}
-
-void CDocument::DeleteItem(optional<size_t> index)
-{
-    if (index == nullopt)
-    {
-        index = GetItemsCount() - 1;
-    }
-    AssertPositionInStructureExists(index.value());
-    m_structure.erase(m_structure.begin() + index.value());
-}
 
 string CDocument::GetTitle() const
 {
@@ -58,28 +18,34 @@ void CDocument::SetTitle(const string &title)
     m_title = title;
 }
 
-void CDocument::Save(const Path &path) const
+std::shared_ptr<IParagraph> CDocument::InsertParagraph(const string &text, std::optional<size_t> position)
 {
+    return std::shared_ptr<IParagraph>();
 }
 
-void CDocument::InsertDocumentItem(CDocumentItem item, optional<size_t> position)
+std::shared_ptr<IImage> CDocument::InsertImage(const Path &path, int width, int height, std::optional<size_t> position)
 {
-    if (position == nullopt)
-    {
-        m_structure.push_back(item);
-        return;
-    }
-    if (position > GetItemsCount())
-    {
-        throw invalid_argument("Impossible position to insert");
-    }
-    m_structure.insert(m_structure.begin() + position.value(), item);
+    return std::shared_ptr<IImage>();
 }
 
-void CDocument::AssertPositionInStructureExists(size_t position) const
+size_t CDocument::GetItemsCount() const
 {
-    if (position >= GetItemsCount())
-    {
-        throw invalid_argument("Position is not exist");
-    }
+    return 0;
+}
+
+IDocumentItem CDocument::GetItem(size_t index)
+{
+    return IDocumentItem();
+}
+
+void CDocument::DeleteItem(std::optional<size_t> position)
+{
+
+}
+
+CDocument::CDocument()
+{
+    auto list = make_unique<CDocumentItemList>();
+    m_executor = make_unique<CUndoableCommandExecutor>();
+    m_list = make_unique<CDocumentItemListWithCommandExecutor>(*list, *m_executor);
 }

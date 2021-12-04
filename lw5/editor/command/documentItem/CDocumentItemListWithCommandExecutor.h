@@ -14,7 +14,7 @@ class ICommandExecutor;
 class CDocumentItemListWithCommandExecutor : public IDocumentItemList
 {
 public:
-    CDocumentItemListWithCommandExecutor(IDocumentItemList &documentItemList,
+    CDocumentItemListWithCommandExecutor(std::shared_ptr<IDocumentItemList> documentItemList,
                                          ICommandExecutor &commandExecutor);
 
     void Add(std::unique_ptr<CDocumentItem> item, std::optional<size_t> position = std::nullopt) override;
@@ -28,7 +28,7 @@ public:
     size_t GetSize() override;
 
 private:
-    IDocumentItemList &m_documentItemList;
+    std::shared_ptr<IDocumentItemList> m_documentItemList;
     ICommandExecutor &m_commandExecutor;
 };
 
