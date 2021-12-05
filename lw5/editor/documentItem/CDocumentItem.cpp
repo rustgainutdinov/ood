@@ -2,7 +2,7 @@
 // Created by rustam.gainutdinov on 20.11.2021.
 //
 
-#include <lw5/editor/content/CParagraph.h>
+#include <lw5/editor/content/IParagraph.h>
 #include <lw5/editor/content/IImage.h>
 #include <lw5/editor/content/IImageResource.h>
 #include <lw5/editor/content/IParagraph.h>
@@ -22,13 +22,13 @@ optional<shared_ptr<IParagraph>> CDocumentItem::GetParagraph()
     return reinterpret_cast<optional<shared_ptr<IParagraph>> &>(m_paragraph);
 }
 
-CDocumentItem::CDocumentItem(optional<shared_ptr<CParagraph>> paragraph,
+CDocumentItem::CDocumentItem(optional<shared_ptr<IParagraph>> paragraph,
                              optional<shared_ptr<IImageResource>> image) : m_image(move(image)),
                                                                    m_paragraph(move(paragraph))
 {
     if (m_paragraph == nullopt && m_image == nullopt || m_paragraph != nullopt && m_image != nullopt)
     {
-        throw invalid_argument("paragraph can contain only one content item");
+        throw invalid_argument("m_paragraph can contain only one content item");
     }
 }
 

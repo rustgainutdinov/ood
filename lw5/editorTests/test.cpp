@@ -13,6 +13,7 @@
 #include "optional"
 #include "lw5/editor/command/documentItem/CDocumentItemListWithCommandExecutor.h"
 #include "lw5/editor/CDocument.h"
+#include "lw5/editor/command/content/CParagraphWithCommandExecutor.h"
 
 using namespace std;
 
@@ -239,6 +240,23 @@ TEST_F(TestImageWithCommandExecutor, shouldBeUndoable)
     executor->Redo();
     ASSERT_EQ(image->GetWidth(), 3);
     ASSERT_EQ(image->GetHeight(), 4);
+}
+
+class TestParagraphWithCommandExecutor : public ::testing::Test
+{
+};
+
+TEST_F(TestParagraphWithCommandExecutor, shouldBeUndoable)
+{
+    auto executor = make_unique<CUndoableCommandExecutor>();
+    auto baseImage = make_unique<CParagraph>("text1");
+    auto image = make_unique<CParagraphWithCommandExecutor>(move(baseImage), *executor);
+    image->SetText("text2");
+    ASSERT_EQ(image->GetText(), "text2");
+    executor->Undo();
+    ASSERT_EQ(image->GetText(), "text1");
+    executor->Redo();
+    ASSERT_EQ(image->GetText(), "text2");
 }
 
 class TestDocumentItemListWithCommandExecutor : public ::testing::Test

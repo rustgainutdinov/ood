@@ -9,8 +9,6 @@
 #include "IDocumentItem.h"
 #include <optional>
 
-class CParagraph;
-
 class IParagraph;
 
 class IImageResource;
@@ -22,7 +20,7 @@ class IImageResource;
 class CDocumentItem : public IDocumentItem
 {
 public:
-    explicit CDocumentItem(std::optional<std::shared_ptr<CParagraph>> paragraph = std::nullopt,
+    explicit CDocumentItem(std::optional<std::shared_ptr<IParagraph>> paragraph = std::nullopt,
                            std::optional<std::shared_ptr<IImageResource>> image = std::nullopt);
 
     std::optional<std::shared_ptr<IImage>> GetImage() override;
@@ -38,7 +36,7 @@ public:
     void TryToMarkAsNotDeleted();
 
 protected:
-    std::optional<std::shared_ptr<CParagraph>> m_paragraph;
+    std::optional<std::shared_ptr<IParagraph>> m_paragraph;
     std::optional<std::shared_ptr<IImageResource>> m_image;
 };
 

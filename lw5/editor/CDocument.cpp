@@ -8,6 +8,7 @@
 #include "lw5/editor/command/documentItem/CDocumentItemListWithCommandExecutor.h"
 #include "lw5/editor/command/content/CImageWithCommandExecutor.h"
 #include "lw5/editor/command/ICommand.h"
+#include "lw5/editor/command/content/CParagraphWithCommandExecutor.h"
 
 using namespace std;
 
@@ -23,7 +24,8 @@ void CDocument::SetTitle(const string &title)
 
 std::shared_ptr<IParagraph> CDocument::InsertParagraph(const string &text, std::optional<size_t> position)
 {
-    auto paragraph = make_shared<CParagraph>(text);
+    auto baseParagraph = make_shared<CParagraph>(text);
+    auto paragraph = make_shared<CParagraphWithCommandExecutor>(baseParagraph, *m_executor);
     auto item = make_unique<CDocumentItem>(paragraph);
     m_list->Add(move(item), position);
     return paragraph;
