@@ -18,6 +18,10 @@ public:
 
     void Redo() override;
 
+    bool CanUndo() override;
+
+    bool CanRedo() override;
+
 private:
     std::vector<std::unique_ptr<ICommand>> m_commands{};
     size_t m_currentCommandIndex = -1;

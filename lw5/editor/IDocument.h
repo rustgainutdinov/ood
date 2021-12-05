@@ -18,7 +18,7 @@ class IDocument
 {
 public:
     virtual std::shared_ptr<IParagraph>
-    InsertParagraph(const std::string &text, std::optional<size_t> position) = 0;
+    InsertParagraph(const std::string &text, std::optional<size_t> position= std::nullopt) = 0;
 
     virtual std::shared_ptr<IImage>
     InsertImage(const Path &path, int width, int height, std::optional<size_t> position = std::nullopt) = 0;
@@ -36,6 +36,10 @@ public:
     virtual void Undo() = 0;
 
     virtual void Redo() = 0;
+
+    virtual bool CanUndo() = 0;
+
+    virtual bool CanRedo() = 0;
 
     virtual ~IDocument() = default;
 };

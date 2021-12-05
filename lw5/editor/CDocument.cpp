@@ -23,12 +23,15 @@ void CDocument::SetTitle(const string &title)
 
 std::shared_ptr<IParagraph> CDocument::InsertParagraph(const string &text, std::optional<size_t> position)
 {
-    return nullptr;
+    auto paragraph = make_shared<CParagraph>(text);
+    auto item = make_unique<CDocumentItem>(paragraph);
+    m_list->Add(move(item), position);
+    return paragraph;
 }
 
 std::shared_ptr<IImage> CDocument::InsertImage(const Path &path, int width, int height, std::optional<size_t> position)
 {
-    auto baseImage = make_shared<CImage>("path 1", 1, 2);
+    auto baseImage = make_shared<CImage>(path, 1, 2);
     auto image = make_shared<CImageWithCommandExecutor>(baseImage, *m_executor);
     auto item = make_unique<CDocumentItem>(nullopt, image);
     m_list->Add(move(item), position);
@@ -65,4 +68,14 @@ void CDocument::Undo()
 void CDocument::Redo()
 {
     m_executor->Redo();
+}
+
+bool CDocument::CanUndo()
+{
+    return m_executor->CanUndo();
+}
+
+bool CDocument::CanRedo()
+{
+    return m_executor->CanRedo();
 }

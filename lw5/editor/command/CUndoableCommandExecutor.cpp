@@ -37,3 +37,13 @@ void CUndoableCommandExecutor::Redo()
     m_currentCommandIndex++;
     m_commands[m_currentCommandIndex]->Execute();
 }
+
+bool CUndoableCommandExecutor::CanUndo()
+{
+    return m_currentCommandIndex != -1;
+}
+
+bool CUndoableCommandExecutor::CanRedo()
+{
+    return m_currentCommandIndex + 1 < m_commands.size();
+}

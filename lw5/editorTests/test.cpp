@@ -276,6 +276,38 @@ class TestDocument : public ::testing::Test
 {
 };
 
+TEST_F(TestDocument, shouldBeAbleToModifyTitle)
+{
+    auto document = make_unique<CDocument>();
+    document->SetTitle("some");
+    ASSERT_EQ(document->GetTitle(), "some");
+    document->SetTitle("some 1");
+    ASSERT_EQ(document->GetTitle(), "some 1");
+}
+
+TEST_F(TestDocument, shouldInsertContent)
+{
+    auto document = make_unique<CDocument>();
+    document->InsertParagraph("text 1");
+    document->InsertParagraph("text 2");
+    ASSERT_EQ(document->GetItemsCount(), 2);
+    ASSERT_THROW(document->GetItem(3), invalid_argument);
+}
+
+TEST_F(TestDocument, shouldInsertContentToDesirtedPosition)
+{
+    auto document = make_unique<CDocument>();
+    document->InsertParagraph("text 1");
+    document->InsertParagraph("text 2", 0);
+    document->InsertImage("path 3", 100, 100, 1);
+    document->InsertParagraph("text 4", 3);
+    ASSERT_EQ(document->GetItemsCount(), 4);
+    ASSERT_EQ(document->GetItem(0).GetParagraph().value()->GetText(), "text 2");
+    ASSERT_EQ(document->GetItem(1).GetImage().value()->GetPath(), "path 3");
+    ASSERT_EQ(document->GetItem(2).GetParagraph().value()->GetText(), "text 1");
+    ASSERT_EQ(document->GetItem(3).GetParagraph().value()->GetText(), "text 4");
+}
+
 TEST_F(TestDocument, shouldBeUndoable)
 {
     auto document = make_unique<CDocument>();
@@ -293,6 +325,39 @@ TEST_F(TestDocument, shouldBeUndoable)
     document->Redo();
     document->Redo();
     ASSERT_EQ(document->GetItemsCount(), 2);
+}
+
+TEST_F(TestDocument, shouldBeUndoableOnlyIfPossibly)
+{
+    auto document = make_unique<CDocument>();
+    document->InsertParagraph("text 0");
+    document->InsertImage("path 1", 100, 100);
+    ASSERT_EQ(document->CanRedo(), false);
+    ASSERT_EQ(document->CanUndo(), true);
+    document->Undo();
+    document->Undo();
+    ASSERT_EQ(document->CanUndo(), false);
+    ASSERT_THROW(document->Undo(), invalid_argument);
+    ASSERT_EQ(document->CanRedo(), true);
+    document->Redo();
+    document->Redo();
+    ASSERT_EQ(document->CanRedo(), false);
+    ASSERT_THROW(document->Redo(), invalid_argument);
+    ASSERT_EQ(document->CanUndo(), true);
+}
+
+TEST_F(TestDocument, shouldBeAbleToChangeUndoBranches)
+{
+    auto document = make_unique<CDocument>();
+    document->InsertParagraph("text 0");
+    document->InsertImage("path 1", 10, 10);
+    document->GetItem(1).GetImage().value()->Resize(20, 20);
+    document->Undo();
+    document->GetItem(1).GetImage().value()->Resize(30, 30);
+    document->Undo();
+    document->Redo();
+    ASSERT_EQ(document->GetItem(1).GetImage().value()->GetWidth(), 30);
+    ASSERT_EQ(document->GetItem(1).GetImage().value()->GetHeight(), 30);
 }
 
 int main(int argc, char *argv[])
