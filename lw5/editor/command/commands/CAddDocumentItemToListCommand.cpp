@@ -17,7 +17,7 @@ CAddDocumentItemToListCommand::CAddDocumentItemToListCommand(std::shared_ptr<IDo
                                                              optional<size_t> position) :
         m_list(move(list)), m_item(move(item)), m_position(position)
 {
-    m_item->TryToCapture();
+    m_item->TryToRetain();
 }
 
 CAddDocumentItemToListCommand::~CAddDocumentItemToListCommand()

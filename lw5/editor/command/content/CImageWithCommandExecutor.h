@@ -24,7 +24,7 @@ public:
 
     void Resize(int width, int height) override;
 
-    void Capture() override;
+    void Retain() override;
 
     void Release() override;
 
@@ -32,7 +32,7 @@ public:
 
     void MarkAsNotDeleted() override;
 
-    bool IsResourceExist() override;
+    bool IsResourceExist() const override;
 
 private:
     std::shared_ptr<IImageResource> m_imageSource;

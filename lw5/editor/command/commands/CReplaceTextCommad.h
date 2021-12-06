@@ -8,13 +8,14 @@
 
 #include "lw5/editor/command/ICommand.h"
 #include "memory"
+#include "string"
 
 class IParagraph;
 
 class CReplaceTextCommand : public ICommand
 {
 public:
-    CReplaceTextCommand(std::shared_ptr<IParagraph> paragraph, const std::string& text);
+    CReplaceTextCommand(std::shared_ptr<IParagraph> paragraph, const std::string &text);
 
     void Execute() override;
 

@@ -8,7 +8,7 @@
 class IResource
 {
 public:
-    virtual void Capture() = 0;
+    virtual void Retain() = 0;
 
     virtual void Release() = 0;
 
@@ -16,7 +16,7 @@ public:
 
     virtual void MarkAsNotDeleted() = 0;
 
-    virtual bool IsResourceExist() = 0;
+    virtual bool IsResourceExist() const = 0;
 };
 
 #endif //OOD_IRESOURCE_H

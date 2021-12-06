@@ -15,7 +15,7 @@ CDeleteDocumentItemFromListCommand::CDeleteDocumentItemFromListCommand(std::shar
                                                                        size_t position) :
         m_list(move(list)), m_position(position)
 {
-    m_list->Get(m_position).TryToCapture();
+    m_list->Get(m_position).TryToRetain();
 }
 
 CDeleteDocumentItemFromListCommand::~CDeleteDocumentItemFromListCommand()

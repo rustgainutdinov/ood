@@ -24,7 +24,7 @@ public:
 
     void Resize(int width, int height) override;
 
-    void Capture() override;
+    void Retain() override;
 
     void Release() override;
 
@@ -32,13 +32,15 @@ public:
 
     void MarkAsNotDeleted() override;
 
-    bool IsResourceExist() override;
+    bool IsResourceExist() const override;
 
 private:
+    void AssertResourceExist() const;
+
     int m_width;
     int m_height;
     Path m_path;
-    int m_placesOfUse = 0;
+    int m_usesCount = 0;
     bool m_isDeleted = false;
     bool m_resourceExist = true;
 };

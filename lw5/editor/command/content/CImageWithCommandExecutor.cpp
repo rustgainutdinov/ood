@@ -34,9 +34,9 @@ void CImageWithCommandExecutor::Resize(int width, int height)
     m_commandExecutor.Add(move(command));
 }
 
-void CImageWithCommandExecutor::Capture()
+void CImageWithCommandExecutor::Retain()
 {
-    m_imageSource->Capture();
+    m_imageSource->Retain();
 }
 
 void CImageWithCommandExecutor::Release()
@@ -54,7 +54,7 @@ void CImageWithCommandExecutor::MarkAsNotDeleted()
     m_imageSource->MarkAsNotDeleted();
 }
 
-bool CImageWithCommandExecutor::IsResourceExist()
+bool CImageWithCommandExecutor::IsResourceExist() const
 {
     return m_imageSource->IsResourceExist();
 }

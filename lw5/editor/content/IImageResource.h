@@ -9,7 +9,7 @@
 #include "lw5/editor/content/IImage.h"
 #include "lw5/editor/content/IResource.h"
 
-class IImageResource : public IImage, public IResource
+class   IImageResource : public IImage, public IResource
 {
 public:
     ~IImageResource() override = default;

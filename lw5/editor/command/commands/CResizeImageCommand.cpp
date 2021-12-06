@@ -13,7 +13,7 @@ CResizeImageCommand::CResizeImageCommand(shared_ptr<IImageResource> image, int w
         m_baseWidth(m_image->GetWidth()),
         m_baseHeight(m_image->GetHeight())
 {
-    m_image->Capture();
+    m_image->Retain();
 }
 
 void CResizeImageCommand::Execute()

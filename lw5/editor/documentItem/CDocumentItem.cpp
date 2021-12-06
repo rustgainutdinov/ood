@@ -32,11 +32,11 @@ CDocumentItem::CDocumentItem(optional<shared_ptr<IParagraph>> paragraph,
     }
 }
 
-void CDocumentItem::TryToCapture()
+void CDocumentItem::TryToRetain()
 {
     if (m_image != nullopt)
     {
-        m_image.value()->Capture();
+        m_image.value()->Retain();
     }
 }
 

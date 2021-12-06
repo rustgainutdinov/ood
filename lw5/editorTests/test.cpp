@@ -163,18 +163,18 @@ TEST_F(TestImageResource, shouldDeleteResourceIfMarkedAsDeletedAndNotInUse)
 {
     auto image = make_shared<CImage>("path 1", 1, 2);
     ASSERT_EQ(image->IsResourceExist(), true);
-    image->Capture();
+    image->Retain();
     image->Release();
 
-    image->Capture();
+    image->Retain();
     image->MarkAsDeleted();
-    image->Capture();
+    image->Retain();
     image->Release();
     image->MarkAsNotDeleted();
     image->Release();
 
-    image->Capture();
-    image->Capture();
+    image->Retain();
+    image->Retain();
     image->MarkAsDeleted();
     image->Release();
     ASSERT_EQ(image->IsResourceExist(), true);

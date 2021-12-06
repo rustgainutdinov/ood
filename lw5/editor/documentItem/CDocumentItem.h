@@ -27,7 +27,7 @@ public:
 
     std::optional<std::shared_ptr<IParagraph>> GetParagraph() override;
 
-    void TryToCapture();
+    void TryToRetain();
 
     void TryToRelease();
 
