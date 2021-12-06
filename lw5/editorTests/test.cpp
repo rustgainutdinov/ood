@@ -17,11 +17,11 @@
 
 using namespace std;
 
-class TestDocumentItem : public ::testing::Test
+class TestICanvas : public ::testing::Test
 {
 };
 
-TEST_F(TestDocumentItem, shouldBeCoustructedWithOnlyOneParameter)
+TEST_F(TestICanvas, shouldBeCoustructedWithOnlyOneParameter)
 {
     auto paragraph = make_shared<CParagraph>("text");
     auto image = make_shared<CImage>("path", 100, 100);

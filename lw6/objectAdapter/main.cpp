@@ -1,7 +1,5 @@
 #include <iostream>
 #include <stdexcept>
-#include <string>
-#include <cstdint>
 
 using namespace std;
 
@@ -182,14 +180,6 @@ namespace modern_graphics_adapter
                 : m_modernGraphicsRenderer(modernGraphicsRenderer)
         {}
 
-        ~CModernGraphicsRendererObjectAdapter() override
-        {
-            if (m_hasDrawingBegun)
-            {
-                m_modernGraphicsRenderer.EndDraw();
-            }
-        }
-
         void MoveTo(int x, int y) override
         {
             m_currentPointPosition = modern_graphics_lib::CPoint(x, y);
@@ -197,11 +187,6 @@ namespace modern_graphics_adapter
 
         void LineTo(int x, int y) override
         {
-            if (!m_hasDrawingBegun)
-            {
-                m_modernGraphicsRenderer.BeginDraw();
-                m_hasDrawingBegun = true;
-            }
             auto pointTo = modern_graphics_lib::CPoint(x, y);
             m_modernGraphicsRenderer.DrawLine(m_currentPointPosition, pointTo);
             m_currentPointPosition = pointTo;
@@ -210,11 +195,10 @@ namespace modern_graphics_adapter
     private:
         modern_graphics_lib::CModernGraphicsRenderer &m_modernGraphicsRenderer;
         modern_graphics_lib::CPoint m_currentPointPosition{0, 0};
-        bool m_hasDrawingBegun = false;
     };
 
     class CModernGraphicsRendererClassAdapter
-            : public graphics_lib::CCanvas, private modern_graphics_lib::CModernGraphicsRenderer
+            : public graphics_lib::ICanvas, private modern_graphics_lib::CModernGraphicsRenderer
     {
     public:
         explicit CModernGraphicsRendererClassAdapter(ostream &strm) : CModernGraphicsRenderer(strm)
@@ -275,6 +259,7 @@ namespace app
     void PaintPictureOnModernGraphicsRendererWithObjectAdapter()
     {
         modern_graphics_lib::CModernGraphicsRenderer renderer(cout);
+        renderer.BeginDraw();
         modern_graphics_adapter::CModernGraphicsRendererObjectAdapter rendererAdapter(renderer);
         shape_drawing_lib::CCanvasPainter painter(rendererAdapter);
         PaintPicture(painter);

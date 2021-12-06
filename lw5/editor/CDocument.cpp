@@ -33,7 +33,7 @@ std::shared_ptr<IParagraph> CDocument::InsertParagraph(const string &text, std::
 
 std::shared_ptr<IImage> CDocument::InsertImage(const Path &path, int width, int height, std::optional<size_t> position)
 {
-    auto baseImage = make_shared<CImage>(path, 1, 2);
+    auto baseImage = make_shared<CImage>(path, width, height);
     auto image = make_shared<CImageWithCommandExecutor>(baseImage, *m_executor);
     auto item = make_unique<CDocumentItem>(nullopt, image);
     m_list->Add(move(item), position);

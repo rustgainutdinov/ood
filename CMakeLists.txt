@@ -67,3 +67,6 @@ target_link_libraries(EditorTests gtest_main)
 add_test(NAME EditorTests COMMAND EditorTests)
 
 add_executable(ObjectAdapter lw6/objectAdapter/main.cpp)
+add_executable(ObjectAdapterTests lw6/objectAdapter/main.cpp lw6/objectAdapter/test.cpp)
+target_link_libraries(ObjectAdapterTests gtest_main)
+add_test(NAME ObjectAdapterTests COMMAND ObjectAdapterTests)
