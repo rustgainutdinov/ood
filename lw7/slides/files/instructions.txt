@@ -2,4 +2,4 @@ rectangle red 0 0 100 100
 rectangle green 100 100 200 200
 rectangle blue 200 200 300 300
 ellipse yellow 150 150 75 75
-ellipse yellow 150 150 150 150
+ellipse yellow 0 150 150 150

@@ -147,7 +147,7 @@ namespace modern_graphics_lib
         {
             if (!m_drawing)
             {
-                throw logic_error("DrawLine is allowed between BeginDraw()/EndDraw() only");
+                throw logic_error("MoveTo is allowed between BeginDraw()/EndDraw() only");
             }
             char s[100];
             sprintf(s, "  <line fromX=%d fromY=%d toX=%d toY=%d/>", start.x, start.y, end.x, end.y);
