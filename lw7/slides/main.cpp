@@ -20,6 +20,7 @@ int main()
     auto rect = make_shared<CRectangle>(3);
     rect->SetLineStyle({true, 255, 255, 0});
     auto rect2 = make_shared<CRectangle>(4);
+    rect2->SetFillStyle({false, 0, 0, 255});
     rect2->SetFrame({50, 50, 200, 150});
     slide->InsertShape(rect, nullopt);
     slide->InsertShape(rect2, nullopt);
@@ -28,5 +29,6 @@ int main()
     slide->Draw(*canvas);
     root->SetFrame({200, 200, 900, 300});
     root->SetLineStyle({true, {0, 255, 255}});
+    root->SetFillStyle({true, {255, 255, 255}});
     slide->Draw(*canvas);
 }

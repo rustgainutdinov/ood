@@ -22,16 +22,18 @@ void CImageCanvas::SetLineColor(Color color)
 void CImageCanvas::BeginFill(Color color)
 {
     m_currentScalarFillColor = {color.r, color.g, color.b};
+    m_pointsToFill.clear();
 }
 
 void CImageCanvas::EndFill()
 {
-
+    cv::fillPoly(m_image, m_pointsToFill, m_currentScalarFillColor);
 }
 
 void CImageCanvas::MoveTo(Point p)
 {
     m_currentPoint = p;
+    m_pointsToFill.emplace_back(p.x, p.y);
 }
 
 void CImageCanvas::LineTo(Point p)
@@ -39,7 +41,7 @@ void CImageCanvas::LineTo(Point p)
     line(m_image, cv::Point(m_currentPoint.x, m_currentPoint.y), cv::Point(p.x, p.y), m_currentScalarLineColor,
          m_lineThickness,
          m_lineType);
-    m_currentPoint = p;
+    MoveTo(p);
 }
 
 void CImageCanvas::DrawEllipse(Point center, int horizontalRadius, int verticalRadius)

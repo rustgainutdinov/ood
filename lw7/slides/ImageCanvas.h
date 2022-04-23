@@ -27,9 +27,9 @@ private:
     cv::Scalar m_currentScalarLineColor;
     cv::Scalar m_currentScalarFillColor;
     cv::Mat m_image;
-    static const int m_lineThickness = 2;
+    static const int m_lineThickness = 5;
     static const int m_lineType = cv::LINE_8;
     std::string m_imagePath;
-    std::vector<Point> pointsToFill;
+    std::vector<cv::Point> m_pointsToFill;
     Point m_currentPoint = {0, 0};
 };
