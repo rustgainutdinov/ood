@@ -71,5 +71,5 @@ add_executable(ObjectAdapterTests lw6/objectAdapter/main.cpp lw6/objectAdapter/t
 target_link_libraries(ObjectAdapterTests gtest_main)
 add_test(NAME ObjectAdapterTests COMMAND ObjectAdapterTests)
 
-add_executable(Slides lw7/slides/main.cpp lw7/slides/IShape.h lw7/slides/RectFrame.h lw7/slides/Style.h lw7/slides/ICanvas.h lw7/slides/CShape.cpp lw7/slides/CShape.h lw7/slides/IGroup.h lw7/slides/CRectangle.cpp lw7/slides/CRectangle.h lw7/slides/ImageCanvas.cpp lw7/slides/ImageCanvas.h lw7/slides/Point.h lw7/slides/CGroup.cpp lw7/slides/CGroup.h lw7/slides/CSlide.cpp lw7/slides/CSlide.h lw7/slides/CTriangle.cpp lw7/slides/CTriangle.h)
+add_executable(Slides lw7/slides/main.cpp lw7/slides/IShape.h lw7/slides/RectFrame.h lw7/slides/Style.h lw7/slides/ICanvas.h lw7/slides/CShape.cpp lw7/slides/CShape.h lw7/slides/IGroup.h lw7/slides/CRectangle.cpp lw7/slides/CRectangle.h lw7/slides/ImageCanvas.cpp lw7/slides/ImageCanvas.h lw7/slides/Point.h lw7/slides/CGroup.cpp lw7/slides/CGroup.h lw7/slides/CSlide.cpp lw7/slides/CSlide.h lw7/slides/CTriangle.cpp lw7/slides/CTriangle.h lw7/slides/CEllipse.cpp lw7/slides/CEllipse.h)
 target_link_libraries(Slides ${OpenCV_LIBS})
