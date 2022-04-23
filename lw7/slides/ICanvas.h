@@ -20,6 +20,8 @@ public:
 
     virtual void DrawEllipse(Point center, int horizontalRadius, int verticalRadius) = 0;
 
+    virtual void FillEllipse(Point center, int horizontalRadius, int verticalRadius) = 0;
+
     virtual void EndFill() = 0;
 };
 

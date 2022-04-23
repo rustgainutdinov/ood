@@ -4,6 +4,7 @@
 
 #include "ImageCanvas.h"
 #include "CRectangle.h"
+#include "CTriangle.h"
 #include "CGroup.h"
 #include "CSlide.h"
 #include "memory"
@@ -19,7 +20,7 @@ int main()
     auto slide = make_unique<CSlide>();
     auto rect = make_shared<CRectangle>(3);
     rect->SetLineStyle({true, 255, 255, 0});
-    auto rect2 = make_shared<CRectangle>(4);
+    auto rect2 = make_shared<CTriangle>(4);
     rect2->SetFillStyle({false, 0, 0, 255});
     rect2->SetFrame({50, 50, 200, 150});
     slide->InsertShape(rect, nullopt);

@@ -56,3 +56,11 @@ CImageCanvas::~CImageCanvas()
 {
     cv::imwrite(m_imagePath, m_image);
 }
+
+void CImageCanvas::FillEllipse(Point center, int horizontalRadius, int verticalRadius)
+{
+    ellipse(m_image, cv::Point(center.x, center.y),
+            cv::Size(horizontalRadius, verticalRadius), 0, 0,
+            360, m_currentScalarFillColor,
+            -1, cv::LINE_AA);
+}

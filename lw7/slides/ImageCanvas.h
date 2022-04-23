@@ -21,6 +21,8 @@ public:
 
     void DrawEllipse(Point center, int horizontalRadius, int verticalRadius) override;
 
+    void FillEllipse(Point center, int horizontalRadius, int verticalRadius) override;
+
     ~CImageCanvas() override;
 
 private:
