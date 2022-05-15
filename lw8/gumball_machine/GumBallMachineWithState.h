@@ -17,6 +17,8 @@ namespace with_state
 
         virtual void Dispense() = 0;
 
+        virtual void Refill(unsigned numBalls) = 0;
+
         virtual std::string ToString() const = 0;
 
         virtual ~IState() = default;
@@ -43,6 +45,8 @@ namespace with_state
         virtual void SetSoldState() = 0;
 
         virtual void SetHasQuartersState() = 0;
+
+        virtual void AddBalls(unsigned numBalls) = 0;
 
         virtual ~IGumballMachine() = default;
     };
@@ -85,6 +89,11 @@ namespace with_state
             {
                 m_gumballMachine.SetNoQuarterState();
             }
+        }
+
+        void Refill(unsigned numBalls) override
+        {
+            m_stream << "Can't refill while ball selling\n";
         }
 
         std::string ToString() const override
@@ -136,6 +145,20 @@ namespace with_state
             return "sold out";
         }
 
+        void Refill(unsigned numBalls) override
+        {
+            m_stream << "Machine refilled\n";
+            m_gumballMachine.AddBalls(numBalls);
+            if (m_gumballMachine.GetQuartersCount() > 0)
+            {
+                m_gumballMachine.SetHasQuartersState();
+            }
+            else
+            {
+                m_gumballMachine.SetNoQuarterState();
+            }
+        }
+
     private:
         IGumballMachine &m_gumballMachine;
         std::stringstream &m_stream;
@@ -170,6 +193,12 @@ namespace with_state
         void Dispense() override
         {
             m_stream << "No gumball dispensed\n";
+        }
+
+        void Refill(unsigned numBalls) override
+        {
+            m_stream << "Machine refilled\n";
+            m_gumballMachine.AddBalls(numBalls);
         }
 
         std::string ToString() const override
@@ -216,6 +245,12 @@ namespace with_state
             return "waiting for quarter";
         }
 
+        void Refill(unsigned numBalls) override
+        {
+            m_stream << "Machine refilled\n";
+            m_gumballMachine.AddBalls(numBalls);
+        }
+
     private:
         IGumballMachine &m_gumballMachine;
         std::stringstream &m_stream;
@@ -257,6 +292,11 @@ namespace with_state
 
             return s + std::to_string(m_count) + " gumball" + (m_count != 1 ? "s" : "") + "Machine is " +
                    m_state->ToString();
+        }
+
+        void Refill(unsigned numBalls)
+        {
+            m_state->Refill(numBalls);
         }
 
     private:
@@ -316,6 +356,11 @@ namespace with_state
         void SetHasQuartersState() override
         {
             m_state = &m_hasQuartersState;
+        }
+
+        void AddBalls(unsigned numBalls) override
+        {
+            m_count += numBalls;
         }
 
     private:

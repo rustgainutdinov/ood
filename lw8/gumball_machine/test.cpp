@@ -224,6 +224,55 @@ TEST_F(TestGumBallMachine, shouldEjectQuartersAfterAllBallsReleased)
     ASSERT_EQ("2 quarters returned", str);
 }
 
+TEST_F(TestGumBallMachine, shouldFillBallsInAnyStateExeptSalling)
+{
+    stringstream ss;
+    string str;
+    with_state::CGumballMachine m(0, ss);
+    m.Refill(5);
+    getline(ss, str);
+    ASSERT_EQ("Machine refilled", str);
+    m.Refill(5);
+    getline(ss, str);
+    ASSERT_EQ("Machine refilled", str);
+    m.InsertQuarter();
+    getline(ss, str);
+    ASSERT_EQ("You inserted a quarter", str);
+    m.Refill(5);
+    getline(ss, str);
+    ASSERT_EQ("Machine refilled", str);
+}
+
+TEST_F(TestGumBallMachine, shouldFillBallsAndChangeStateFromSoldOutWithQuaters)
+{
+    stringstream ss;
+    string str;
+    with_state::CGumballMachine m(1, ss);
+    m.InsertQuarter();
+    getline(ss, str);
+    ASSERT_EQ("You inserted a quarter", str);
+    m.InsertQuarter();
+    getline(ss, str);
+    ASSERT_EQ("You insert another quarter", str);
+    m.InsertQuarter();
+    getline(ss, str);
+    ASSERT_EQ("You insert another quarter", str);
+    m.TurnCrank();
+    getline(ss, str);
+    ASSERT_EQ("You turned...", str);
+    getline(ss, str);
+    ASSERT_EQ("A gumball comes rolling out the slot...", str);
+    getline(ss, str);
+    ASSERT_EQ("Oops, out of gumballs", str);
+    m.Refill(5);
+    getline(ss, str);
+    ASSERT_EQ("Machine refilled", str);
+    m.TurnCrank();
+    getline(ss, str);
+    ASSERT_EQ("You turned...", str);
+    getline(ss, str);
+    ASSERT_EQ("A gumball comes rolling out the slot...", str);
+}
 
 TEST_F(TestNaiveGumBallMachine, shouldBeInSoldOutStateAfterCreation)
 {
