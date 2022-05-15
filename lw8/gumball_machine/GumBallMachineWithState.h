@@ -11,7 +11,7 @@ namespace with_state
     {
         virtual void InsertQuarter() = 0;
 
-        virtual void EjectQuarter() = 0;
+        virtual void EjectQuarters() = 0;
 
         virtual void TurnCrank() = 0;
 
@@ -26,7 +26,15 @@ namespace with_state
     {
         virtual void ReleaseBall() = 0;
 
+        virtual void ReleaseQuarters() = 0;
+
         virtual unsigned GetBallCount() const = 0;
+
+        virtual unsigned GetQuartersCount() const = 0;
+
+        virtual void IncQuarters() = 0;
+
+        virtual void DecQuarters() = 0;
 
         virtual void SetSoldOutState() = 0;
 
@@ -34,7 +42,7 @@ namespace with_state
 
         virtual void SetSoldState() = 0;
 
-        virtual void SetHasQuarterState() = 0;
+        virtual void SetHasQuartersState() = 0;
 
         virtual ~IGumballMachine() = default;
     };
@@ -51,7 +59,7 @@ namespace with_state
             m_stream << "Please wait, we're already giving you a gumball\n";
         }
 
-        void EjectQuarter() override
+        void EjectQuarters() override
         {
             m_stream << "Sorry you already turned the crank\n";
         }
@@ -68,6 +76,10 @@ namespace with_state
             {
                 m_stream << "Oops, out of gumballs\n";
                 m_gumballMachine.SetSoldOutState();
+            }
+            else if (m_gumballMachine.GetQuartersCount() > 0)
+            {
+                m_gumballMachine.SetHasQuartersState();
             }
             else
             {
@@ -97,9 +109,16 @@ namespace with_state
             m_stream << "You can't insert a quarter, the machine is sold out\n";
         }
 
-        void EjectQuarter() override
+        void EjectQuarters() override
         {
-            m_stream << "You can't eject, you haven't inserted a quarter yet\n";
+            if (m_gumballMachine.GetQuartersCount() > 0)
+            {
+                m_gumballMachine.ReleaseQuarters();
+            }
+            else
+            {
+                m_stream << "You can't eject, you haven't inserted a quarter yet\n";
+            }
         }
 
         void TurnCrank() override
@@ -122,27 +141,29 @@ namespace with_state
         std::stringstream &m_stream;
     };
 
-    class CHasQuarterState : public IState
+    class CHasQuartersState : public IState
     {
     public:
-        CHasQuarterState(IGumballMachine &gumballMachine, std::stringstream &stream)
+        CHasQuartersState(IGumballMachine &gumballMachine, std::stringstream &stream)
                 : m_gumballMachine(gumballMachine), m_stream(stream)
         {}
 
         void InsertQuarter() override
         {
-            m_stream << "You can't insert another quarter\n";
+            m_stream << "You can insert another quarter\n";
+            m_gumballMachine.IncQuarters();
         }
 
-        void EjectQuarter() override
+        void EjectQuarters() override
         {
-            m_stream << "Quarter returned\n";
+            m_gumballMachine.ReleaseQuarters();
             m_gumballMachine.SetNoQuarterState();
         }
 
         void TurnCrank() override
         {
             m_stream << "You turned...\n";
+            m_gumballMachine.DecQuarters();
             m_gumballMachine.SetSoldState();
         }
 
@@ -171,10 +192,11 @@ namespace with_state
         void InsertQuarter() override
         {
             m_stream << "You inserted a quarter\n";
-            m_gumballMachine.SetHasQuarterState();
+            m_gumballMachine.IncQuarters();
+            m_gumballMachine.SetHasQuartersState();
         }
 
-        void EjectQuarter() override
+        void EjectQuarters() override
         {
             m_stream << "You haven't inserted a quarter\n";
         }
@@ -204,7 +226,7 @@ namespace with_state
     public:
         CGumballMachine(unsigned numBalls, std::stringstream &stream)
                 : m_soldState(*this, stream), m_soldOutState(*this, stream), m_noQuarterState(*this, stream),
-                  m_hasQuarterState(*this, stream),
+                  m_hasQuartersState(*this, stream),
                   m_state(&m_soldOutState), m_count(numBalls), m_stream(stream)
         {
             if (m_count > 0)
@@ -213,9 +235,9 @@ namespace with_state
             }
         }
 
-        void EjectQuarter()
+        void EjectQuarters()
         {
-            m_state->EjectQuarter();
+            m_state->EjectQuarters();
         }
 
         void InsertQuarter()
@@ -233,13 +255,32 @@ namespace with_state
         {
             std::string s = "Mighty Gumball, Inc. C++\n-enabled Standing Gumball Model #2016 (with state)\nInventory: ";
 
-            return s + std::to_string(m_count) + " gumball" + (m_count != 1 ? "s" : "") + "Machine is " + m_state->ToString();
+            return s + std::to_string(m_count) + " gumball" + (m_count != 1 ? "s" : "") + "Machine is " +
+                   m_state->ToString();
         }
 
     private:
         unsigned GetBallCount() const override
         {
             return m_count;
+        }
+
+        unsigned GetQuartersCount() const override
+        {
+            return m_quartersCount;
+        }
+
+        void IncQuarters() override
+        {
+            ++m_quartersCount;
+        }
+
+        void DecQuarters() override
+        {
+            if (m_quartersCount != 0)
+            {
+                --m_quartersCount;
+            }
         }
 
         virtual void ReleaseBall() override
@@ -249,6 +290,12 @@ namespace with_state
                 m_stream << "A gumball comes rolling out the slot...\n";
                 --m_count;
             }
+        }
+
+        virtual void ReleaseQuarters() override
+        {
+            m_stream << std::to_string(GetQuartersCount()) << " quarters returned\n";
+            m_quartersCount = 0;
         }
 
         void SetSoldOutState() override
@@ -266,17 +313,18 @@ namespace with_state
             m_state = &m_soldState;
         }
 
-        void SetHasQuarterState() override
+        void SetHasQuartersState() override
         {
-            m_state = &m_hasQuarterState;
+            m_state = &m_hasQuartersState;
         }
 
     private:
         unsigned m_count = 0;
+        unsigned m_quartersCount = 0;
         CSoldState m_soldState;
         CSoldOutState m_soldOutState;
         CNoQuarterState m_noQuarterState;
-        CHasQuarterState m_hasQuarterState;
+        CHasQuartersState m_hasQuartersState;
         IState *m_state;
         std::stringstream &m_stream;
     };
