@@ -24,6 +24,7 @@ public:
 
     virtual void SetFrame(RectFrame rect) = 0;
 
+    //сделать возврат мутабельной структуры
     virtual std::optional<Style> GetLineStyle() const = 0;
 
     virtual void SetLineStyle(Style style) = 0;

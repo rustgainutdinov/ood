@@ -15,9 +15,7 @@ using namespace std;
 
 int main()
 {
-    auto canvas = make_unique<CImageCanvas>(
-            "/Users/rustamgajnutdinov/Documents/study/ood/lw7/slides/files/a.jpg");
-
+    auto canvas = make_unique<CImageCanvas>("./files/a.jpg");
     auto slide = make_unique<CSlide>();
     auto rect = make_shared<CRectangle>(3);
     rect->SetLineStyle({true, 255, 255, 0});
