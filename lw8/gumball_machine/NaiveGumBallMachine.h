@@ -30,10 +30,12 @@ namespace naive
                     break;
                 case State::NoQuarter:
                     m_stream << "You inserted a quarter\n";
+                    IncQuarters();
                     m_state = State::HasQuarter;
                     break;
                 case State::HasQuarter:
-                    m_stream << "You can't insert another quarter\n";
+                    m_stream << "You insert another quarter\n";
+                    IncQuarters();
                     break;
                 case State::Sold:
                     m_stream << "Please wait, we're already giving you a gumball\n";
@@ -41,13 +43,13 @@ namespace naive
             }
         }
 
-        void EjectQuarter()
+        void EjectQuarters()
         {
             using namespace std;
             switch (m_state)
             {
                 case State::HasQuarter:
-                    m_stream << "Quarter returned\n";
+                    ReleaseQuarters();
                     m_state = State::NoQuarter;
                     break;
                 case State::NoQuarter:
@@ -57,7 +59,14 @@ namespace naive
                     m_stream << "Sorry you already turned the crank\n";
                     break;
                 case State::SoldOut:
-                    m_stream << "You can't eject, you haven't inserted a quarter yet\n";
+                    if (GetQuartersCount() > 0)
+                    {
+                        ReleaseQuarters();
+                    }
+                    else
+                    {
+                        m_stream << "You can't eject, you haven't inserted a quarter yet\n";
+                    }
                     break;
             }
         }
@@ -76,6 +85,7 @@ namespace naive
                 case State::HasQuarter:
                     m_stream << "You turned...\n";
                     m_state = State::Sold;
+                    DecQuarters();
                     Dispense();
                     break;
                 case State::Sold:
@@ -116,6 +126,10 @@ namespace naive
                         m_stream << "Oops, out of gumballs\n";
                         m_state = State::SoldOut;
                     }
+                    else if (GetQuartersCount() > 0)
+                    {
+                        m_state = State::HasQuarter;
+                    }
                     else
                     {
                         m_state = State::NoQuarter;
@@ -131,8 +145,33 @@ namespace naive
             }
         }
 
+        unsigned GetQuartersCount() const
+        {
+            return m_quartersCount;
+        }
+
+        void IncQuarters()
+        {
+            ++m_quartersCount;
+        }
+
+        void DecQuarters()
+        {
+            if (m_quartersCount != 0)
+            {
+                --m_quartersCount;
+            }
+        }
+
+        virtual void ReleaseQuarters()
+        {
+            m_stream << std::to_string(GetQuartersCount()) << " quarters returned\n";
+            m_quartersCount = 0;
+        }
+
         unsigned m_count;    // Количество шариков
         State m_state = State::SoldOut;
         std::stringstream &m_stream;
+        unsigned m_quartersCount = 0;
     };
 }

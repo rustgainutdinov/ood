@@ -150,7 +150,7 @@ namespace with_state
 
         void InsertQuarter() override
         {
-            m_stream << "You can insert another quarter\n";
+            m_stream << "You insert another quarter\n";
             m_gumballMachine.IncQuarters();
         }
 
@@ -265,6 +265,15 @@ namespace with_state
             return m_count;
         }
 
+        virtual void ReleaseBall() override
+        {
+            if (m_count != 0)
+            {
+                m_stream << "A gumball comes rolling out the slot...\n";
+                --m_count;
+            }
+        }
+
         unsigned GetQuartersCount() const override
         {
             return m_quartersCount;
@@ -280,15 +289,6 @@ namespace with_state
             if (m_quartersCount != 0)
             {
                 --m_quartersCount;
-            }
-        }
-
-        virtual void ReleaseBall() override
-        {
-            if (m_count != 0)
-            {
-                m_stream << "A gumball comes rolling out the slot...\n";
-                --m_count;
             }
         }
 
