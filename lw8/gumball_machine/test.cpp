@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "GumBallMachineWithState.h"
+#include "NaiveGumBallMachine.h"
 
 using namespace std;
 
