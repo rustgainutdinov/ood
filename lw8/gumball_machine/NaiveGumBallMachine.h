@@ -15,7 +15,7 @@ namespace naive
             Sold,            // Монетка выдана
         };
 
-        CGumballMachine(unsigned count, std::stringstream &stream)
+        CGumballMachine(unsigned count, std::ostream &stream)
                 : m_count(count), m_state(count > 0 ? State::NoQuarter : State::SoldOut), m_stream(stream)
         {
         }
@@ -34,6 +34,11 @@ namespace naive
                     m_state = State::HasQuarter;
                     break;
                 case State::HasQuarter:
+                    if (GetQuartersCount() >= 5)
+                    {
+                        m_stream << "You can't insert more than 5 quarters\n";
+                        return;
+                    }
                     m_stream << "You insert another quarter\n";
                     IncQuarters();
                     break;
@@ -171,7 +176,7 @@ namespace naive
 
         unsigned m_count;    // Количество шариков
         State m_state = State::SoldOut;
-        std::stringstream &m_stream;
+        std::ostream &m_stream;
         unsigned m_quartersCount = 0;
     };
 }

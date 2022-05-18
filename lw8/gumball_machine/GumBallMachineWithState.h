@@ -54,7 +54,7 @@ namespace with_state
     class CSoldState : public IState
     {
     public:
-        CSoldState(IGumballMachine &gumballMachine, std::stringstream &stream)
+        CSoldState(IGumballMachine &gumballMachine, std::ostream &stream)
                 : m_gumballMachine(gumballMachine), m_stream(stream)
         {}
 
@@ -103,13 +103,13 @@ namespace with_state
 
     private:
         IGumballMachine &m_gumballMachine;
-        std::stringstream &m_stream;
+        std::ostream &m_stream;
     };
 
     class CSoldOutState : public IState
     {
     public:
-        CSoldOutState(IGumballMachine &gumballMachine, std::stringstream &stream)
+        CSoldOutState(IGumballMachine &gumballMachine, std::ostream &stream)
                 : m_gumballMachine(gumballMachine), m_stream(stream)
         {}
 
@@ -161,18 +161,23 @@ namespace with_state
 
     private:
         IGumballMachine &m_gumballMachine;
-        std::stringstream &m_stream;
+        std::ostream &m_stream;
     };
 
     class CHasQuartersState : public IState
     {
     public:
-        CHasQuartersState(IGumballMachine &gumballMachine, std::stringstream &stream)
+        CHasQuartersState(IGumballMachine &gumballMachine, std::ostream &stream)
                 : m_gumballMachine(gumballMachine), m_stream(stream)
         {}
 
         void InsertQuarter() override
         {
+            if (m_gumballMachine.GetQuartersCount() >= 5)
+            {
+                m_stream << "You can't insert more than 5 quarters\n";
+                return;
+            }
             m_stream << "You insert another quarter\n";
             m_gumballMachine.IncQuarters();
         }
@@ -201,20 +206,20 @@ namespace with_state
             m_gumballMachine.AddBalls(numBalls);
         }
 
-        std::string ToString() const override
+        [[nodiscard]] std::string ToString() const override
         {
             return "waiting for turn of crank";
         }
 
     private:
         IGumballMachine &m_gumballMachine;
-        std::stringstream &m_stream;
+        std::ostream &m_stream;
     };
 
     class CNoQuarterState : public IState
     {
     public:
-        CNoQuarterState(IGumballMachine &gumballMachine, std::stringstream &stream)
+        CNoQuarterState(IGumballMachine &gumballMachine, std::ostream &stream)
                 : m_gumballMachine(gumballMachine), m_stream(stream)
         {}
 
@@ -253,13 +258,13 @@ namespace with_state
 
     private:
         IGumballMachine &m_gumballMachine;
-        std::stringstream &m_stream;
+        std::ostream &m_stream;
     };
 
     class CGumballMachine : private IGumballMachine
     {
     public:
-        CGumballMachine(unsigned numBalls, std::stringstream &stream)
+        CGumballMachine(unsigned numBalls, std::ostream &stream)//TODO: принимать ostream
                 : m_soldState(*this, stream), m_soldOutState(*this, stream), m_noQuarterState(*this, stream),
                   m_hasQuartersState(*this, stream),
                   m_state(&m_soldOutState), m_count(numBalls), m_stream(stream)
@@ -371,7 +376,7 @@ namespace with_state
         CNoQuarterState m_noQuarterState;
         CHasQuartersState m_hasQuartersState;
         IState *m_state;
-        std::stringstream &m_stream;
+        std::ostream &m_stream;
     };
 
 }

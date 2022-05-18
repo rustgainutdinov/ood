@@ -122,6 +122,26 @@ TEST_F(TestGumBallMachine, shouldInsertQuarterIfQuarterAlreadyInserted)
     ASSERT_EQ("You insert another quarter", str);
 }
 
+TEST_F(TestGumBallMachine, shouldNotInsertQuarterIfFiveQuartersAlreadyInserted)
+{
+    stringstream ss;
+    string str;
+    with_state::CGumballMachine m(1, ss);
+    m.InsertQuarter();
+    getline(ss, str);
+    m.InsertQuarter();
+    getline(ss, str);
+    m.InsertQuarter();
+    getline(ss, str);
+    m.InsertQuarter();
+    getline(ss, str);
+    m.InsertQuarter();
+    getline(ss, str);
+    m.InsertQuarter();
+    getline(ss, str);
+    ASSERT_EQ("You can't insert more than 5 quarters", str);
+}
+
 TEST_F(TestGumBallMachine, shouldEjectAllQuartersIfQuartersAlreadyInserted)
 {
     stringstream ss;
@@ -380,6 +400,26 @@ TEST_F(TestNaiveGumBallMachine, shouldInsertQuarterIfQuarterAlreadyInserted)
     m.InsertQuarter();
     getline(ss, str);
     ASSERT_EQ("You insert another quarter", str);
+}
+
+TEST_F(TestNaiveGumBallMachine, shouldNotInsertQuarterIfFiveQuartersAlreadyInserted)
+{
+    stringstream ss;
+    string str;
+    naive::CGumballMachine m(1, ss);
+    m.InsertQuarter();
+    getline(ss, str);
+    m.InsertQuarter();
+    getline(ss, str);
+    m.InsertQuarter();
+    getline(ss, str);
+    m.InsertQuarter();
+    getline(ss, str);
+    m.InsertQuarter();
+    getline(ss, str);
+    m.InsertQuarter();
+    getline(ss, str);
+    ASSERT_EQ("You can't insert more than 5 quarters", str);
 }
 
 TEST_F(TestNaiveGumBallMachine, shouldEjectAllQuartersIfQuartersAlreadyInserted)
